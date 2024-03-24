@@ -1,0 +1,22 @@
+.header {
+  width: 96%;
+  max-width: 1600px;
+  height: 8vh;
+  margin: auto;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  position: fixed;
+  top: 0.5vh;
+  left: 0;
+  right: 0;
+}
+
+@media screen and (orientation: portrait) {
+  .header {
+    height: 6vh;
+  }
+}

@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 1vmin;
+  align-items: center;
+}
+
+.person {
+  height: 8vh;
+  width: 8vh;
+
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.person:active {
+  background-color: #eeeeee;
+}
+
+.person-icon {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+@media screen and (orientation: portrait) {
+  .person {
+    height: min(6vh, 11vw);
+    width: min(6vh, 11vw);
+  }
+}

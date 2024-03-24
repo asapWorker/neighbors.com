@@ -1,0 +1,20 @@
+.item {
+  width: 100%;
+  height: fit-content;
+  padding: 1vh;
+  padding-top: 3vh;
+
+  position: relative;
+
+  background-color: #ffffff;
+  border: 1px solid #555555;
+  border-radius: 1vmin;
+  margin-bottom: 1vmin;
+}
+
+.stars {
+  position: absolute;
+  height: min(3vh, 10vw);
+  top: 0.2vh;
+  right: 1vh;
+}

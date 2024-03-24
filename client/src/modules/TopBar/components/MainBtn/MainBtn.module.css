@@ -1,0 +1,9 @@
+.main-btn {
+  font-size: min(5vh, 8vw);
+  font-weight: bold;
+  color: #666666;
+
+  background-color: transparent;
+  padding: 0;
+  border: none;
+}

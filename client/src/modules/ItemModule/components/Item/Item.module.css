@@ -1,0 +1,29 @@
+.item {
+  height: 99%;
+  width: 100%;
+}
+
+.stars-container {
+  height: min(4vh, 10vw);
+  width: 100%;
+  margin: 1vh 0 4vh;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.stars {
+  height: 100%;
+  width: fit-content;
+
+  position: relative;
+}
+
+.btn-container {
+  position: absolute;
+  bottom: 2%;
+
+  left: 50%;
+  transform: translate(-50%);
+}

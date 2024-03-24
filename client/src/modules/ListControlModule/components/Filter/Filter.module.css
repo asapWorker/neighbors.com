@@ -1,0 +1,13 @@
+.filter {
+  height: min(4vh, 7vw);
+  width: fit-content;
+  padding: 0;
+  border: none;
+
+  background-color: transparent;
+}
+
+.filter-img {
+  height: 100%;
+  width: auto;
+}

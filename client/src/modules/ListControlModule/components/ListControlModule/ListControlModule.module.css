@@ -1,0 +1,16 @@
+.list-control-module {
+  width: 100%;
+  height: 5vh;
+  padding-left: 1vmin;
+  padding-right: 1vmin;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

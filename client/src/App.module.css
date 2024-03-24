@@ -1,0 +1,17 @@
+.app {
+  width: 96%;
+  max-width: 1600px;
+  height: 100vh;
+  padding-top: 10vh;
+  margin: auto;
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+@media screen and (orientation: portrait) {
+  .app {
+    padding-top: 8vh;
+  }
+}

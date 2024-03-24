@@ -1,0 +1,1 @@
+export {FilterModule} from "./components/FilterModule/FilterModule";

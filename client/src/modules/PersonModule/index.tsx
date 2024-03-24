@@ -1,0 +1,1 @@
+export {PersonModule} from "./components/PersonModule/PersonModule";

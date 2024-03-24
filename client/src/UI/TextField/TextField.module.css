@@ -1,0 +1,24 @@
+.text-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  width: 100%;
+}
+
+.input {
+  font-size: min(3vh, 5vw);
+  font-family: sans-serif;
+
+  width: 100%;
+  border: 1px solid #555555;
+
+  align-self: flex-end;
+}
+
+.message {
+  align-self: flex-end;
+
+  font-size: min(2vh, 4vw);
+  font-family: sans-serif;
+}

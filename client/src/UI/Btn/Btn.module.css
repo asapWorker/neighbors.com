@@ -1,0 +1,17 @@
+.btn {
+  padding: 1.5vmin 2vmax;
+  width: fit-content;
+  height: auto;
+
+  background-color: #2857ff;
+  border-radius: 1vmin;
+
+  font-family: sans-serif;
+  font-size: min(3.5vh, 5vw);
+  color: #ffffff;
+  line-height: 1;
+}
+
+.btn:active {
+  background-color: #5b4187;
+}

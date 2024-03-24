@@ -1,0 +1,1 @@
+export {PersonPage} from "./components/PersonPage/PersonPage";

@@ -1,0 +1,24 @@
+.switch {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1vmin;
+}
+
+.btn {
+  font-size: min(3.5vh, 7vw);
+  font-weight: bold;
+  color: #000000;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+.btn:active {
+  text-decoration: underline;
+  background-color: transparent;
+}
+
+.active {
+  text-decoration: underline;
+}

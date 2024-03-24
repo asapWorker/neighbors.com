@@ -1,0 +1,11 @@
+.text {
+  font-family: sans-serif;
+  font-weight: normal;
+  font-size: min(5vw, 3vh);
+
+  color: #000;
+}
+
+.bold {
+  font-weight: bold;
+}

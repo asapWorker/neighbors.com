@@ -1,0 +1,79 @@
+.filter-module {
+  position: absolute;
+  z-index: 3;
+
+  height: 89.5vh;
+  width: 100%;
+  top: 0vh;
+
+  background-color: #ffffff;
+
+  font-size: min(3vh, 4vw);
+  font-family: sans-serif;
+
+  border: 1px solid #666666;
+  border-radius: 1vmin;
+  padding: 2vmin 3vw;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+
+.title {
+  font-size: min(4vh, 15vw);
+  font-family: sans-serif;
+  font-weight: bold;
+  color: #000000;
+
+  margin-bottom: 2vh;
+}
+
+.radio, .checkbox {
+  width: min(2vh, 3vw);
+  height: min(2vh, 3vw);
+  margin-left: 0.5vw;
+}
+
+
+.str {
+  margin-left: 1vw;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1vw;
+}
+
+.bold {
+  font-weight: bold;
+  margin-bottom: 0.5vh;
+}
+
+.btn-save-container {
+  align-self: center;
+  margin-bottom: 0;
+  justify-self: end;
+
+  position: absolute;
+  bottom: 2vmin;
+}
+
+.select {
+  padding-left: 1vmin;
+  padding-right: 1vmin;
+  margin-left: 0.5vw;
+
+  height: 4vh;
+  
+  font-size: min(3vh, 4vw);
+  font-family: sans-serif;
+
+  background-color: #bbbbbb;
+}
+
+.metro-list {
+  margin-top: 1vh;
+  height: 44vh;
+  overflow: auto;
+}
