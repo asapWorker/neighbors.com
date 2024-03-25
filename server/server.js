@@ -1,13 +1,16 @@
 const express = require("express");
-const app = express();
 cors = require("cors");
 
+const app = express();
+
 const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 const PORT = 8080;
 
 app.use(cors());
+
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
@@ -135,6 +138,7 @@ const housesList = [
   },
 ];
 
+
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
@@ -166,7 +170,7 @@ app.get("/item", (req, res) => {
       JSON.stringify({
         mark: 5,
         attitudeTowardSmoking: "Neutral",
-        boundedItems: ["Мария"]
+        boundedItems: ["Мария"],
       })
     );
   } else {
@@ -181,20 +185,70 @@ app.get("/item", (req, res) => {
   }
 });
 
+// получение данных объявления для страницы личного кабинета
+app.get("prerson/item", (req, res) => {
+  const userId = req.query.id
+
+  let answer = {
+    type: "person",
+    id: "6",
+    address: "Профсоюзная 104а",
+    sex: "Female",
+    metro: ["Коньково", "Беляево", "Комсомольская"],
+    money: 2200
+  }
+
+  res.end(answer);
+})
+
+
+/* POST запросы */
 // удаление объявления
 app.post("/item/delete", (req, res) => {
   const itemType = req.query.item;
-  const id = req.query.id;
+  const itemId = req.query.id;
 
   res.end();
 })
 
 // изменение поля
-app.post("item/change", (req, res) => {
+app.post("/item/change", (req, res) => {
   const itemType = req.query.item;
   const id = req.query.id;
   const field = req.query.field;
   const value = req.body;
 
+  res.end();
+})
+
+// Обработка входа
+app.post("/enter", (req, res) => {
+  const login = req.body.get("login");
+  const password = req.body.get("password");
+
+  if (login === "admin") {
+    res.end(JSON.stringify({
+      id: "11",
+      type: "Admin"
+    }))
+  } else if (login === "client") {
+    res.end(JSON.stringify({
+      id: "22",
+      type: "Client",
+      house: true,
+      person: false
+    }))
+  } else {
+    return res.end(null)
+  }
+})
+
+// обработка регистрации
+app.post("/registration", (req, res) => {
+  res.end();
+})
+
+// обработка довбавления нового объявления
+app.post("/new-item", (req, res) => {
   res.end();
 })

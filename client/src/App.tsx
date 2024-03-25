@@ -11,9 +11,9 @@ import { RegistrationPage } from "./pages/RegistrationPage";
 import { PersonPage } from "./pages/PersonPage";
 
 export const App = function() {
-  const {user, isLookingForHouse, changeUser} = useUserData();
+  const {user, isLookingForHouse, isLookingForPerson, changeUser} = useUserData();
 
-  return <UserContextProvider user={user} changeUser={changeUser} isLookingForHouse={isLookingForHouse}>
+  return <UserContextProvider user={user} changeUser={changeUser} isLookingForHouse={isLookingForHouse} isLookingForPerson={isLookingForPerson}>
     <div className={styles.app}>
       <BrowserRouter>
         <TopBar/>
@@ -24,7 +24,7 @@ export const App = function() {
           <Route path={"/:user/item/:type/:data"} element={<ItemPage/>}/>
           <Route path={"/enter"} element={<EnterPage/>}/>
           <Route path={"/registration"} element={<RegistrationPage/>}/>
-          <Route path={"/info/:user/:ids"} element={<PersonPage/>}/>
+          <Route path={"/personal account"} element={<PersonPage/>}/>
         </Routes>
       </BrowserRouter>
     </div>

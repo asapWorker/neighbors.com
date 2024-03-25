@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ExtendedHouseItem } from "../types/ExtendedHouseItem";
 import { ExtendedPersonItem } from "../types/ExtendedPersonItem";
+import { BaseHouseItem, BasePersonItem } from "../../../types/ItemTypes";
 import { getExtraHouseData, getExtraPersonData } from "../api/getExtraData";
 import {
   AttitudeTowardSmoking,
@@ -10,6 +11,8 @@ import {
   YesNo,
 } from "../../../constants/constants";
 import { getBoundedItemsList } from "../api/getBoundedItemsList";
+import { useIsLookingForData } from "../../../contexts/useUserContext";
+import { UserData } from "../../../hooks/useUserData";
 
 const REPLICATION = 3;
 
@@ -25,20 +28,33 @@ async function getExtraData<T>(callback: () => Promise<T>): Promise<T> {
 }
 
 export const useItemData = (
-  user: string,
+  user: UserData,
   type: string,
-  defaultData: Object
+  defaultData:
+    | ExtendedHouseItem
+    | ExtendedPersonItem
+    | (BaseHouseItem & { type: string })
+    | (BasePersonItem & { type: string }),
+  isPersonal: boolean,
+  reportDeletion: () => void
 ) => {
   const navigate = useNavigate();
 
+  const { isLookingForHouse, isLookingForPerson } = useIsLookingForData();
+
   const [itemData, setItemData] = useState<
-    ExtendedHouseItem & ExtendedPersonItem
+    ExtendedHouseItem | ExtendedPersonItem | BaseHouseItem | BasePersonItem
   >(null);
 
   const [isChanged, setIsChanged] = useState<boolean>(true);
   const [boundedItemsList, setBoundedItemsList] = useState<string[]>([]);
 
   useEffect(() => {
+    if (isPersonal) {
+      setItemData(defaultData);
+      return;
+    }
+
     let baseData;
 
     if (type === "house") {
@@ -85,11 +101,13 @@ export const useItemData = (
         });
     }
 
-    getExtraData(getBoundedItemsList).then((list) => {
-      setBoundedItemsList(list);
-    }).catch(() => {
-      setBoundedItemsList([]);
-    })
+    getExtraData(getBoundedItemsList)
+      .then((list) => {
+        setBoundedItemsList(list);
+      })
+      .catch(() => {
+        setBoundedItemsList([]);
+      });
   }, [isChanged]);
 
   const setNewData = useCallback(
@@ -116,7 +134,12 @@ export const useItemData = (
 
     if (itemData) {
       deleteItemInfo(type, itemData.id).finally(() => {
-        navigate("..");
+        setItemData(null);
+        reportDeletion();
+        
+        if (!isPersonal) {
+          navigate("..");
+        }
       });
     }
   }, [itemData]);
@@ -131,13 +154,16 @@ export const useItemData = (
   }, []);
 
   return {
-    isEditable: user === User.Admin,
+    isEditable: user?.type === User.Admin || isPersonal,
     isHouse: type === "house" ? true : false,
-    isClient: user === User.Client,
+    isClient: user?.type === User.Client,
     itemData,
     setNewData,
     chooseHandle,
     deleteHandle,
-    boundedItemsList
+    boundedItemsList,
+    isHouseBtnIsVisible: isLookingForHouse && (type === "house" ? true : false),
+    isPersonBtnIsVisible:
+      isLookingForPerson && (type === "person" ? true : false),
   };
 };

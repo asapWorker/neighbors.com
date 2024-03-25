@@ -5,11 +5,11 @@ import { HouseItem } from "../types/houseType";
 import { PersonItem } from "../types/personType";
 
 export const useItemData = () => {
-  const {user} = useUser();
+  const user = useUser();
   const navigate = useNavigate();
 
   const handleItemClick = useCallback((data: HouseItem | PersonItem, isHouse: boolean) => {
-    navigate("/" + user + "/item/" + (isHouse ? "house/" : "person/") + JSON.stringify(data));
+    navigate("/" + user.type + "/item/" + (isHouse ? "house/" : "person/") + JSON.stringify(data));
   }, [user])
 
   return {

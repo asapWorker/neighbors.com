@@ -1,15 +1,34 @@
 import { FunctionComponent } from "react";
-import { FormModule } from "../../../FormModule";
-import { ExtraForm } from "../ExtraForm/ExtraForm";
-import { FormType } from "../../../FormModule/components/FormModule/FormModule";
-
-interface PersonModuleProps {
-  
-}
+import { Item } from "../../../ItemModule";
+import { User } from "../../../../constants/constants";
+import { usePersonModuleData } from "../../hooks/usePersonModuleData";
+import { Btn } from "../../../../UI/Btn/Btn";
+import { FormModule, FormType } from "../../../FormModule/components/FormModule/FormModule";
 
 export const PersonModule: FunctionComponent = () => {
-  return <>
-    <FormModule type={FormType.NewAnnouncement}/>
-    <ExtraForm/>
-  </>
-}
+  const { user, baseData, isForm, deleteItem, openForm, closeForm } = usePersonModuleData();
+
+  if (user.type === User.Admin) {
+    return <>
+      <Btn onClickHandle={openForm}>Добавить объявление</Btn>
+    </>
+  }
+
+  return (
+    <>
+      {baseData && (
+        <Item
+          user={user}
+          type={user.type}
+          baseData={baseData}
+          isPersonal={true}
+          reportDeletion={deleteItem}
+        />
+      )}
+
+      {isForm && <FormModule type={FormType.NewAnnouncement}/>}
+
+      {!isForm && !baseData && <Btn onClickHandle={openForm}>Добавить объявление</Btn>}
+    </>
+  );
+};

@@ -23,10 +23,12 @@ export const enum FormType {
 
 interface FormModuleProps {
   type: FormType;
+  reportAboutSubmit?: () => void;
 }
 
 export const FormModule: FunctionComponent<FormModuleProps> = ({
-  type
+  type,
+  reportAboutSubmit = () => {}
 }) => {
   const {
     formRef,
@@ -36,7 +38,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
     signUp,
     isHouse,
     targetChangeHandle,
-  } = useFormData();
+  } = useFormData(type === FormType.NewAnnouncement, reportAboutSubmit);
 
   if (type === FormType.Enter) {
     return (

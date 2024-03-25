@@ -1,5 +1,5 @@
 // user
-export const enum User {
+export enum User {
   Guest = "guest",
   Client = "user",
   Admin = "admin",

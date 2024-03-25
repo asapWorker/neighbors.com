@@ -10,13 +10,13 @@ const enum Text {
 
 export const useEnterPensonBtnsData = () => {
   const navigate = useNavigate();
-  const {user} = useUser();
+  const user = useUser();
   const {changeUser} = useChangeUser();
 
   const [text, setText] = useState<Text>(Text.Enter);
 
   useEffect(() => {
-    if (user === User.Guest) {
+    if (user.type === User.Guest) {
       setText(Text.Enter);
     } else {
       setText(Text.Exit);
@@ -24,22 +24,22 @@ export const useEnterPensonBtnsData = () => {
   }, [user])
   
   const handleEnterClick = useCallback(() => {
-    if (user === User.Guest) {
+    if (user.type === User.Guest) {
       navigate("/enter");
     } else {
       const isConfirmed = confirm("Вы действительно хотите выйти?");
       if (!isConfirmed) return;
 
-      changeUser(User.Guest);
+      changeUser(User.Guest, "", false, false);
       navigate("../");
     }
   }, [user])
 
   const handlePersonClick = useCallback(() => {
-    if (!user || user === User.Guest) {
+    if (!user || user.type === User.Guest) {
       return;
     } else {
-      navigate("./info/" + user);
+      navigate("./personal account");
     }
   }, [user])
 

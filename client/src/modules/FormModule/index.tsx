@@ -1,1 +1,1 @@
-export {FormModule} from "./components/FormModule/FormModule";
+export {FormModule, FormType} from "./components/FormModule/FormModule";

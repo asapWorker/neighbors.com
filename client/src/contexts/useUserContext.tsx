@@ -1,11 +1,17 @@
 import { FunctionComponent, createContext, useContext } from "react";
-
+import { UserData } from "../hooks/useUserData";
 import { User } from "../constants/constants";
 
 interface UserContextType {
-  user: User;
-  changeUser: (user: User) => void;
+  user: UserData;
+  changeUser: (
+    type: User,
+    id: string,
+    isLookingForHouse: boolean,
+    isLookingForPerson: boolean
+  ) => void;
   isLookingForHouse: boolean;
+  isLookingForPerson: boolean;
 }
 
 interface UserContextProviderProps extends UserContextType {
@@ -15,7 +21,17 @@ interface UserContextProviderProps extends UserContextType {
 const UserContext = createContext<UserContextType>(null);
 
 export const useUser = () => {
-  return { user: useContext(UserContext).user, isLookingForHouse: useContext(UserContext).isLookingForHouse };
+  return {
+    type: useContext(UserContext).user.type,
+    id: useContext(UserContext).user.id,
+  };
+};
+
+export const useIsLookingForData = () => {
+  return {
+    isLookingForHouse: useContext(UserContext).isLookingForHouse,
+    isLookingForPerson: useContext(UserContext).isLookingForPerson,
+  };
 };
 
 export const useChangeUser = () => {
@@ -24,9 +40,11 @@ export const useChangeUser = () => {
 
 export const UserContextProvider: FunctionComponent<
   UserContextProviderProps
-> = ({ children, user, isLookingForHouse, changeUser }) => {
+> = ({ children, user, isLookingForHouse, isLookingForPerson, changeUser }) => {
   return (
-    <UserContext.Provider value={{ user, isLookingForHouse, changeUser }}>
+    <UserContext.Provider
+      value={{ user, isLookingForHouse, isLookingForPerson, changeUser }}
+    >
       {children}
     </UserContext.Provider>
   );
