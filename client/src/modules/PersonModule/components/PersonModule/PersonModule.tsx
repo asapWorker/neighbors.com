@@ -8,15 +8,9 @@ import { FormModule, FormType } from "../../../FormModule/components/FormModule/
 export const PersonModule: FunctionComponent = () => {
   const { user, baseData, isForm, deleteItem, openForm, closeForm } = usePersonModuleData();
 
-  if (user.type === User.Admin) {
-    return <>
-      <Btn onClickHandle={openForm}>Добавить объявление</Btn>
-    </>
-  }
-
   return (
     <>
-      {baseData && (
+      {baseData && (user.type !== User.Admin) && (
         <Item
           user={user}
           type={user.type}
@@ -26,9 +20,9 @@ export const PersonModule: FunctionComponent = () => {
         />
       )}
 
-      {isForm && <FormModule type={FormType.NewAnnouncement}/>}
+      {isForm && <FormModule type={FormType.NewAnnouncement} reportAboutSubmit={closeForm}/>}
 
-      {!isForm && !baseData && <Btn onClickHandle={openForm}>Добавить объявление</Btn>}
+      {(!isForm && !baseData || ((user.type === User.Admin) && !isForm)) && <Btn onClickHandle={openForm}>Добавить объявление</Btn>}
     </>
   );
 };

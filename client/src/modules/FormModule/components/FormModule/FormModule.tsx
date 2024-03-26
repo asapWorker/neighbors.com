@@ -107,22 +107,6 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
             >
               <Text type={TextType.Bold}>Пароль:</Text>
             </TextField>
-
-            <TextField name="name" isMessage={!isFilled}>
-              <Text type={TextType.Bold}>Имя:</Text>
-            </TextField>
-
-            <TextField
-              name="age"
-              isMessage={!isFilled}
-              type={TextFieldType.Number}
-            >
-              <Text type={TextType.Bold}>Возраст:</Text>
-            </TextField>
-
-            <RadioField radios={personSexes} name="sex">
-              <Text type={TextType.Bold}>Пол:</Text>
-            </RadioField>
           </>}
 
           <div className={styles.target}>
@@ -191,6 +175,22 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
 
           {isHouse && (
             <>
+              <TextField name="name" isMessage={!isFilled}>
+                <Text type={TextType.Bold}>Имя:</Text>
+              </TextField>
+
+              <TextField
+                name="age"
+                isMessage={!isFilled}
+                type={TextFieldType.Number}
+              >
+                <Text type={TextType.Bold}>Возраст:</Text>
+              </TextField>
+
+              <RadioField radios={personSexes} name="sex">
+                <Text type={TextType.Bold}>Пол:</Text>
+              </RadioField>
+
               <TextField
                 name="money"
                 isMessage={!isFilled}

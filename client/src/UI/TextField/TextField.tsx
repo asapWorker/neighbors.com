@@ -46,7 +46,7 @@ export const TextField: FunctionComponent<TextFieldProps> = ({
       />
 
       <div className={styles.message}>
-        {(!isMessage || value.length >= 8 || ((type === TextFieldType.Password) && value !== ""))
+        {(!isMessage || value.length >= 8 || ((type !== TextFieldType.Password) && value !== ""))
           ? Message.No
           : (value === "")
           ? Message.Empty

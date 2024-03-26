@@ -15,22 +15,24 @@ async function getExtraData(item: string, id: string) {
 }
 
 export async function getExtraHouseData(id: string) {
-  const res = await getExtraData('house-list', id);
+  const res = await getExtraData('house', id);
 
   return {
     mark: res.mark,
     type: HouseType[res.type],
     smoking: res.smokingAllowed ? YesNo.Yes : YesNo.No,
-    boundedItems: res.boundedItems
+    boundedItems: res.boundedItems,
+    animals: res.animals ? YesNo.Yes : YesNo.No
   }
 }
 
 export async function getExtraPersonData(id: string) {
-  const res = await getExtraData('person-list', id);
+  const res = await getExtraData('person', id);
 
   return {
     mark: res.mark,
     attitudeTowardSmoking: AttitudeTowardSmoking[res.attitudeTowardSmoking],
-    boundedItems: res.boundedItems
+    boundedItems: res.boundedItems,
+    animals: res.animals ? YesNo.Yes : YesNo.No
   }
 }

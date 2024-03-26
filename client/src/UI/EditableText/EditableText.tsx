@@ -13,6 +13,7 @@ interface EditableTextProps {
   isWithRating?: boolean;
   options?: string[];
   isMultiple?: boolean;
+  isNumber?: boolean;
 }
 
 export const EditableText: FunctionComponent<EditableTextProps> = ({
@@ -21,7 +22,8 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
   saveChanges,
   options = null,
   isMultiple = false,
-  isWithRating = false
+  isWithRating = false,
+  isNumber = false
 }) => {
   const {
     isEditing,
@@ -67,6 +69,7 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
               onChange={textChangeHandle.bind(this)}
               className={styles["text-input"]}
               value={curValue}
+              type={isNumber ? "number" : "text"}
             />
           )}
 

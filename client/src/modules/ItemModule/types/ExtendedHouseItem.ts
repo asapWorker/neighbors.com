@@ -6,4 +6,5 @@ export interface ExtendedHouseItem extends HouseItem {
   type: HouseType;
   smoking: YesNo;
   boundedItems: string[];
+  animals: YesNo;
 }

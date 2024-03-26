@@ -1,16 +1,18 @@
 const express = require("express");
 cors = require("cors");
+const multer = require('multer');
 
 const app = express();
 
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
-
-const PORT = 8080;
-
 app.use(cors());
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+const upload = multer();
+
+
+const PORT = 8080;
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
@@ -171,6 +173,7 @@ app.get("/item", (req, res) => {
         mark: 5,
         attitudeTowardSmoking: "Neutral",
         boundedItems: ["Мария"],
+        animals: true
       })
     );
   } else {
@@ -179,26 +182,28 @@ app.get("/item", (req, res) => {
         mark: 5,
         type: "Dorm",
         smokingAllowed: false,
-        boundedItems: ["Мария"]
+        boundedItems: ["Мария"],
+        animals: false
       })
     )
   }
 });
 
 // получение данных объявления для страницы личного кабинета
-app.get("prerson/item", (req, res) => {
+app.get("/person/item", (req, res) => {
   const userId = req.query.id
 
   let answer = {
-    type: "person",
+    type: "house",
     id: "6",
     address: "Профсоюзная 104а",
     sex: "Female",
     metro: ["Коньково", "Беляево", "Комсомольская"],
-    money: 2200
+    money: 2200,
+    animals: true
   }
 
-  res.end(answer);
+  res.end(JSON.stringify(answer));
 })
 
 
@@ -213,18 +218,19 @@ app.post("/item/delete", (req, res) => {
 
 // изменение поля
 app.post("/item/change", (req, res) => {
+
   const itemType = req.query.item;
   const id = req.query.id;
-  const field = req.query.field;
-  const value = req.body;
+  const field = req.body.field;
+  const value = req.body.value;
 
   res.end();
 })
 
 // Обработка входа
-app.post("/enter", (req, res) => {
-  const login = req.body.get("login");
-  const password = req.body.get("password");
+app.post("/enter", upload.any(), (req, res) => {
+  const login = req.body.login;
+  const password = req.body.password;
 
   if (login === "admin") {
     res.end(JSON.stringify({
@@ -244,11 +250,11 @@ app.post("/enter", (req, res) => {
 })
 
 // обработка регистрации
-app.post("/registration", (req, res) => {
+app.post("/registration", upload.any(), (req, res) => {
   res.end();
 })
 
-// обработка довбавления нового объявления
-app.post("/new-item", (req, res) => {
+// обработка добавления нового объявления
+app.post("/new-item", upload.any(), (req, res) => {
   res.end();
 })

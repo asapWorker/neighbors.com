@@ -99,7 +99,7 @@ export const FilterModule: FunctionComponent<FilterModuleProps> = ({
           Метро:
           <div className={styles["metro-list"]}>
             {Metros.map((item) => {
-              return <div className={styles["str"]}>
+              return <div key={item} className={styles["str"]}>
                 <input
                   type="checkbox"
                   name="metro"

@@ -1,4 +1,4 @@
-async function deleteItemInfo(item: string, id: string) {
+export async function deleteItemInfo(item: string, id: string) {
   try {
     const response = await fetch(
       `http://localhost:8080/item/delete/?` + new URLSearchParams({ item, id }),

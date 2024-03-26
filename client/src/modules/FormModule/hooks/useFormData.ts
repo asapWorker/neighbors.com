@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useChangeUser, useUser } from "../../../contexts/useUserContext";
 import { useNavigate } from "react-router-dom";
-import { User } from "../../../constants/constants";
 import { enter } from "../api/enter";
 import { registrate } from "../api/registrate";
 

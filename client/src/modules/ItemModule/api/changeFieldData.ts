@@ -1,4 +1,4 @@
-async function changeFieldData(item: string, id: string, field: string, value: any) {
+export async function changeFieldData(item: string, id: string, field: string, value: any) {
   try {
     const response = await fetch(
       `http://localhost:8080/item/change/?` + new URLSearchParams({ item, id, field }),
@@ -6,9 +6,12 @@ async function changeFieldData(item: string, id: string, field: string, value: a
       {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json;charset=utf-8'
+          'Content-Type': 'application/json; charset=utf-8'
         },
-        body: JSON.stringify(value)
+        body: JSON.stringify({
+          field,
+          value
+        })
       },
     );
 
