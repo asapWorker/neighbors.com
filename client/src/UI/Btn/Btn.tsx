@@ -7,6 +7,7 @@ interface BtnProps {
   style?: string;
   isSubmit?: boolean;
   onClickHandle?: () => void;
+  title?: string;
 }
 
 export const Btn: FunctionComponent<BtnProps> = ({
@@ -14,12 +15,14 @@ export const Btn: FunctionComponent<BtnProps> = ({
   children,
   style = "",
   isSubmit = false,
+  title = ""
 }) => {
   return (
     <button
       type={isSubmit ? "submit" : "button"}
       className={style === "" ? styles.btn : style}
       onClick={onClickHandle}
+      title={title}
     >
       {children}
     </button>

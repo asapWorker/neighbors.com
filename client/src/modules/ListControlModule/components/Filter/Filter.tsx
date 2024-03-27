@@ -13,6 +13,6 @@ export const Filter: FunctionComponent<FilterProps> = ({
   openFilter
 }) => {
   return <Btn style={styles.filter} onClickHandle={openFilter}>
-    <img src={filterImgUrl} alt="filter-img" className={styles["filter-img"]}/>
+    <img src={filterImgUrl} alt="filter-img" className={styles["filter-img"]} title={"Фильтровать список"}/>
   </Btn>
 }

@@ -10,7 +10,7 @@ export async function registrate(form: FormData) {
     );
 
     return  true;
-
+    
   } catch {
     console.log("не удается зарегестрироваться");
     return null;

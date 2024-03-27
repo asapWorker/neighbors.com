@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useChangeUser, useUser } from "../../../contexts/useUserContext";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { enter } from "../api/enter";
 import { registrate } from "../api/registrate";
 
@@ -16,7 +16,7 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
 
 
   const goToRegistration = useCallback(() => {
-    navige("../registration");
+    navige("../registrate");
   }, [])
 
   /* !!!!! */
@@ -84,10 +84,14 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
         } else {
           setIsFilled(false);
         }
+      }).catch(() => {
+        console.log("Не удалось зарегистрироваться");
       })
     } else {
       setIsFilled(false);
     }
+
+    event.preventDefault();
   }, [user])
 
   const targetChangeHandle = useCallback((event: any) => {

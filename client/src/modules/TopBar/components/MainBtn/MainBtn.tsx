@@ -6,7 +6,7 @@ export const MainBtn = () => {
   const {handleMainClick} = useMainBtnData();
 
   return (
-    <Btn style={styles["main-btn"]} onClickHandle={handleMainClick}>
+    <Btn style={styles["main-btn"]} onClickHandle={handleMainClick} title={"Переход на главную страницу"}>
       Neighbors.com
     </Btn>
   );

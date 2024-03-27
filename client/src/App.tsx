@@ -23,7 +23,7 @@ export const App = function() {
           <Route path={"/"} element={<MainPage/>}/>
           <Route path={"/:user/item/:type/:data"} element={<ItemPage/>}/>
           <Route path={"/enter"} element={<EnterPage/>}/>
-          <Route path={"/registration"} element={<RegistrationPage/>}/>
+          <Route path={"/registrate"} element={<RegistrationPage/>}/>
           <Route path={"/personal account"} element={<PersonPage/>}/>
         </Routes>
       </BrowserRouter>

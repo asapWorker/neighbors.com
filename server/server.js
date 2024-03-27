@@ -250,7 +250,7 @@ app.post("/enter", upload.any(), (req, res) => {
 })
 
 // обработка регистрации
-app.post("/registration", upload.any(), (req, res) => {
+app.post("/registrate", upload.any(), (req, res) => {
   res.end();
 })
 

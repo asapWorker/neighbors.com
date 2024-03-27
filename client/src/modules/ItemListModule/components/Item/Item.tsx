@@ -22,7 +22,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 }) => {
   const {handleItemClick} = useItemData();
 
-  return <Btn onClickHandle={handleItemClick.bind(this, itemData, isHouse)} style={styles.item}>
+  return <Btn onClickHandle={handleItemClick.bind(this, itemData, isHouse)} style={styles.item} title={"Нажмите, чтобы увидеть полную информацию"}>
     <Stars mark={itemData.mark} style={styles.stars}/>
     <ItemText itemData={itemData}/>
   </Btn>

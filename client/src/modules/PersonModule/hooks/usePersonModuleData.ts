@@ -43,6 +43,7 @@ export const usePersonModuleData = () => {
       })
       .catch(() => {
         setBaseData(null);
+        setIsForm(false);
       });
   }, []);
 
