@@ -1,0 +1,14 @@
+.personal {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: min(4vh, 15vw);
+  font-family: sans-serif;
+  font-weight: bold;
+  color: #000000;
+
+  margin-bottom: 2vh;
+}

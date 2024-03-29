@@ -206,6 +206,48 @@ app.get("/person/item", (req, res) => {
   res.end(JSON.stringify(answer));
 })
 
+// получение списка оценок жилья и людей конкретного пользователя
+app.get("/marks", upload.any(), (req, res) => {
+  res.end(JSON.stringify([
+    {
+      isPerson: true,
+      mark: 0,
+      name: "Мария",
+      id: "5435345835"
+    },
+    {
+      isPerson: true,
+      mark: 3,
+      name: "Профсоюзная 83к2",
+      id: "94568406934"
+    },
+    {
+      isPerson: true,
+      mark: 2,
+      name: "Анастсия",
+      id: "45854960458"
+    },
+    {
+      isPerson: true,
+      mark: 0,
+      name: "Мария",
+      id: "5435345835"
+    },
+    {
+      isPerson: true,
+      mark: 3,
+      name: "Профсоюзная 83к2",
+      id: "94568406934"
+    },
+    {
+      isPerson: true,
+      mark: 2,
+      name: "Анастсия",
+      id: "45854960458"
+    }
+  ]))
+})
+
 
 /* POST запросы */
 // удаление объявления
@@ -256,5 +298,10 @@ app.post("/registrate", upload.any(), (req, res) => {
 
 // обработка добавления нового объявления
 app.post("/new-item", upload.any(), (req, res) => {
+  res.end();
+})
+
+// изменение оценки жилья или человека конкретным пользователем
+app.post("/change/mark", upload.any(), (req, res) => {
   res.end();
 })

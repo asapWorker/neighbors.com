@@ -5,15 +5,17 @@ import { Children, FunctionComponent } from "react";
 import { Text, TextType } from "../Text/Text";
 import { useEditableTextData } from "./hooks/useEditableTextData";
 import { Btn } from "../Btn/Btn";
+import { Stars } from "../Stars/Stars";
 
 interface EditableTextProps {
   children: React.ReactNode;
   isEditable: boolean;
-  saveChanges: (value: any) => void;
+  saveChanges: (value: any) => boolean | null;
   isWithRating?: boolean;
   options?: string[];
   isMultiple?: boolean;
   isNumber?: boolean;
+  areMark?: boolean;
 }
 
 export const EditableText: FunctionComponent<EditableTextProps> = ({
@@ -23,11 +25,13 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
   options = null,
   isMultiple = false,
   isWithRating = false,
-  isNumber = false
+  isNumber = false,
+  areMark = false
 }) => {
   const {
     isEditing,
     value,
+    rating,
     curValue,
     curRating,
     edit,
@@ -46,7 +50,8 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
       <div className={classnames(styles.str)}>
         <div className={styles["text-container"]}>
           {Children.toArray(children)[0]}
-          <Text type={TextType.Normal}>{value}</Text>
+          {!areMark && <Text type={TextType.Normal}>{value}</Text>}
+          {areMark && <Stars mark={rating}/>}
         </div>
 
         <Btn onClickHandle={edit} style={styles.btn}>

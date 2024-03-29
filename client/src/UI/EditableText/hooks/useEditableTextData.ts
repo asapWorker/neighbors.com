@@ -3,13 +3,14 @@ import { YesNo } from "../../../constants/constants";
 
 export const useEditableTextData = (
   defaultValue: string,
-  saveChanges: (val: any) => void,
+  saveChanges: (val: any) => boolean | null,
   isWithRating: boolean
 ) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [curValue, setCurValue] = useState<string | string[]>("");
   const [value, setValue] = useState<string | string[]>(defaultValue);
   const [curRating, setCurRating] = useState<number>(0);
+  const [rating, setRating] = useState<number>(Number(defaultValue));
 
   const edit = useCallback(() => {
     setIsEditing(true);
@@ -50,6 +51,11 @@ export const useEditableTextData = (
       }
       
       setIsEditing(false);
+    } else if (isWithRating && curRating) {
+      if (saveChanges(curRating)) {
+        setRating(curRating);
+        setIsEditing(false);
+      }
     }
   }, [curValue, curRating]);
 
@@ -60,6 +66,7 @@ export const useEditableTextData = (
   return {
     isEditing,
     value,
+    rating,
     curValue,
     curRating,
     edit,
