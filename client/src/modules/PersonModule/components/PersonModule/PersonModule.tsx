@@ -26,7 +26,7 @@ export const PersonModule: FunctionComponent = () => {
       {baseData && user.type !== User.Admin && (
         <Item
           user={user}
-          type={baseData.type}
+          type={baseData.announcement}
           baseData={baseData}
           isPersonal={true}
           reportDeletion={deleteItem}

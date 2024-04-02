@@ -4,7 +4,8 @@ import { YesNo } from "../../../constants/constants";
 export const useEditableTextData = (
   defaultValue: string,
   saveChanges: (val: any) => boolean | null,
-  isWithRating: boolean
+  isWithRating: boolean,
+  areMark: boolean
 ) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [curValue, setCurValue] = useState<string | string[]>("");
@@ -25,7 +26,14 @@ export const useEditableTextData = (
   }, [setCurValue]);
 
   const ratingChangeHandle = useCallback((event: any) => {
-    setCurRating(event.target.value);
+    let val = event.target.value;
+    if ((areMark && val < 0) || (areMark && val < -1)) {
+      val = areMark ? 0 : -1
+    } else if (val > 5) {
+      val = 5
+    }
+    
+    setCurRating(val);
   }, [setCurRating])
 
   const submitChange = useCallback(() => {

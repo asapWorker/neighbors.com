@@ -1,4 +1,4 @@
-import { Sex, YesNo } from "../../../constants/constants";
+import { HouseType, Sex, YesNo } from "../../../constants/constants";
 
 export async function getPersonalItemData(id: string) {
   const response = await fetch(
@@ -13,6 +13,9 @@ export async function getPersonalItemData(id: string) {
 
   result.animals = result.animals ? YesNo.Yes : YesNo.No;
   result.sex = Sex[result.sex];
+  if ("type" in result) {
+    result.type = HouseType[result.type]
+  }
 
   return result;
 }

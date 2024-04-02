@@ -147,17 +147,17 @@ app.get("/", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   if (req.query.target === "person-list") {
-    res.end(JSON.stringify(personsList));
+    res.end(JSON.stringify(personsList)); // см. personsList
   } else {
-    res.end(JSON.stringify(housesList));
+    res.end(JSON.stringify(housesList)); // см. housesList
   }
 });
 
-// получение списка имен людей
+// получение списка имен всех людей
 app.get("/bounded", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
-  res.end(JSON.stringify(personsList.map(item => item.name)));
+  res.end(JSON.stringify(personsList.map(item => item.name))); // [string, ...]
 });
 
 // получение дополнительных данных для конкретного пользователя или жилья
@@ -165,11 +165,11 @@ app.get("/item", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   const itemType = req.query.item;
-  const id = req.query.id;
+  const itemId = req.query.id; // id объявления человека или жилья
 
   if (itemType === "person") {
     res.end(
-      JSON.stringify({
+      JSON.stringify({ // дополнитльные данные для person
         mark: 5,
         attitudeTowardSmoking: "Neutral",
         boundedItems: ["Мария"],
@@ -178,7 +178,7 @@ app.get("/item", (req, res) => {
     );
   } else {
     res.end(
-      JSON.stringify({
+      JSON.stringify({ // дополнительные данные для house
         mark: 5,
         type: "Dorm",
         smokingAllowed: false,
@@ -193,8 +193,9 @@ app.get("/item", (req, res) => {
 app.get("/person/item", (req, res) => {
   const userId = req.query.id
 
-  let answer = {
-    type: "house",
+  let answer = { // объявление для жилья в личном кабинете
+    announcement: "house",
+    type: "Dorm",
     id: "6",
     address: "Профсоюзная 104а",
     sex: "Female",
@@ -202,6 +203,18 @@ app.get("/person/item", (req, res) => {
     money: 2200,
     animals: true
   }
+
+  /*
+  {
+    type: "person",
+    id: "6",
+    name: "Мария Новикова",
+    age: 23,
+    sex: "Female | Male",
+    money: 30000,
+    animals: false
+  }
+  */
 
   res.end(JSON.stringify(answer));
 })
@@ -213,7 +226,7 @@ app.get("/marks", upload.any(), (req, res) => {
       isPerson: true,
       mark: 0,
       name: "Мария",
-      id: "5435345835"
+      id: "5435345835" // id объявления
     },
     {
       isPerson: true,
@@ -252,7 +265,7 @@ app.get("/marks", upload.any(), (req, res) => {
 /* POST запросы */
 // удаление объявления
 app.post("/item/delete", (req, res) => {
-  const itemType = req.query.item;
+  const itemType = req.query.item; // house | person
   const itemId = req.query.id;
 
   res.end();
@@ -261,9 +274,11 @@ app.post("/item/delete", (req, res) => {
 // изменение поля
 app.post("/item/change", (req, res) => {
 
-  const itemType = req.query.item;
-  const id = req.query.id;
-  const field = req.body.field;
+  const itemType = req.query.item; // house | person
+  const id = req.query.id; // house | person id
+  const field = req.body.field; // field name
+  // Дом: address | metro | sex | money | type | smoking | animals | bounded-items
+  // Человек: name | age | sex | money | attitude-toward-smoking | animals | bounded-items
   const value = req.body.value;
 
   res.end();
@@ -293,6 +308,7 @@ app.post("/enter", upload.any(), (req, res) => {
 
 // обработка регистрации
 app.post("/registrate", upload.any(), (req, res) => {
+
   res.end();
 })
 

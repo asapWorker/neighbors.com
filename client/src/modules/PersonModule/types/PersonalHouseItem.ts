@@ -4,5 +4,5 @@ import { BaseHouseItem } from "../../../types/ItemTypes";
 export interface PersonalHouseItem extends BaseHouseItem {
   smoking: YesNo;
   animals: YesNo;
-  type: string;
+  announcement: string;
 }

@@ -42,7 +42,8 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
   } = useEditableTextData(
     Children.toArray(children)[1].toString(),
     saveChanges,
-    isWithRating
+    isWithRating,
+    areMark
   );
 
   if (isEditable && !isEditing) {
@@ -81,7 +82,7 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
           {isWithRating && (
             <input
               type="number"
-              min={-1}
+              min={areMark ? 0 : -1}
               max={5}
               onChange={ratingChangeHandle.bind(this)}
               className={styles["text-input"]}

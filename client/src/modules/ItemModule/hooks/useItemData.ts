@@ -168,8 +168,7 @@ export const useItemData = (
     chooseHandle,
     deleteHandle,
     boundedItemsList,
-    isHouseBtnIsVisible: isLookingForHouse && (type === "house" ? true : false),
-    isPersonBtnIsVisible:
-      isLookingForPerson && (type === "person" ? true : false),
+    isHouseBtnIsVisible: isLookingForHouse && (type === "person" ? true : false),
+    isPersonBtnIsVisible: isLookingForPerson && (type === "house" ? true : false)
   };
 };
