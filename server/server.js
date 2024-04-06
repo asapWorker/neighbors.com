@@ -1,3 +1,4 @@
+// настройки express
 const express = require("express");
 cors = require("cors");
 const multer = require('multer');
@@ -18,128 +19,19 @@ app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
 
-/* демонстрационные данные */
 
-// список объявлений о человеке
-const personsList = [
-  {
-    id: "11",
-    name: "Александр Петров",
-    age: 23,
-    sex: "Male",
-    money: 20000,
-    mark: 0
-  },
 
-  {
-    id: "22",
-    name: "Мария Иванова",
-    age: 30,
-    sex: "Female",
-    money: 30000,
-    mark: 3.1
-  },
+// временные данные
+const {personsList, housesList, clients} = require("./tempData");
 
-  {
-    id: "33",
-    name: "Дарья Сергеева",
-    age: 22,
-    sex: "Female",
-    money: 40000,
-    mark: 4.6
-  },
 
-  {
-    id: "44",
-    name: "Александра Петрова",
-    age: 40,
-    sex: "Female",
-    money: 20000,
-    mark: 0
-  },
 
-  {
-    id: "55",
-    name: "Мария Сидорова",
-    age: 18,
-    sex: "Female",
-    money: 10000,
-    mark: 4.3
-  },
+//neo4j
+const { getClientsNames, addOrUpdateConnection, deleteConnection } = require("./neo4jModule/neo4jModule");
 
-  {
-    id: "66",
-    name: "Виктор Савельев",
-    age: 30,
-    sex: "Male",
-    money: 15000,
-    mark: 3.2
-  },
-];
 
-// список объявлений о жилье
-const housesList = [
-  {
-    id: "1",
-    address: "Профсоюзная 83, к2",
-    sex: "Any",
-    metro: ["Беляево"],
-    money: 2200,
-    mark: 2.8,
-    marks: 3
-  },
 
-  {
-    id: "2",
-    address: "Профсоюзная 105",
-    sex: "Any",
-    metro: ["Беляево", "Новые черемушки"],
-    money: 2200,
-    mark: 4.3,
-    marks: 2
-  },
-
-  {
-    id: "3",
-    address: "Профсоюзная 4",
-    sex: "Any",
-    metro: ["Октябрьская"],
-    money: 2200,
-    mark: 3.2,
-    marks: 3
-  },
-
-  {
-    id: "4",
-    address: "Профсоюзная 4",
-    sex: "Any",
-    metro: ["Октябрьская"],
-    money: 3300,
-    mark: 4.8,
-    marks: 2
-  },
-
-  {
-    id: "5",
-    address: "Профсоюзная 102",
-    sex: "Male",
-    metro: ["Коньково", "Беляево", "Новые черемушки"],
-    money: 2200,
-    mark: 3.6,
-    marks: 4
-  },
-
-  {
-    id: "6",
-    address: "Профсоюзная 104а",
-    sex: "Female",
-    metro: ["Коньково", "Беляево", "Комсомольская"],
-    money: 2200,
-    mark: 4.1,
-    marks: 5
-  },
-];
-
+/* Запросы */
 
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
@@ -153,40 +45,53 @@ app.get("/", (req, res) => {
   }
 });
 
-// получение списка имен всех людей
+// получение списка логинов, id клиентов
 app.get("/bounded", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
-  res.end(JSON.stringify(personsList.map(item => item.name))); // [string, ...]
+  res.end(JSON.stringify(clients.map(item => {
+    return {
+      login: item.login,
+      id: item.id
+    }
+  })));
 });
 
 // получение дополнительных данных для конкретного пользователя или жилья
 app.get("/item", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
+
+  // временные данные
   const itemType = req.query.item;
   const itemId = req.query.id; // id объявления человека или жилья
 
+  let result = null;
+
   if (itemType === "person") {
-    res.end(
-      JSON.stringify({ // дополнитльные данные для person
-        mark: 5,
-        attitudeTowardSmoking: "Neutral",
-        boundedItems: ["Мария"],
-        animals: true
-      })
-    );
+    result = { // дополнитльные данные для person
+      mark: 5,
+      attitudeTowardSmoking: "Neutral",
+      boundedItems: [],
+      animals: true
+    }
   } else {
-    res.end(
-      JSON.stringify({ // дополнительные данные для house
-        mark: 5,
-        type: "Dorm",
-        smokingAllowed: false,
-        boundedItems: ["Мария"],
-        animals: false
-      })
-    )
+    result = { // дополнительные данные для house
+      mark: 5,
+      type: "Dorm",
+      smokingAllowed: false,
+      boundedItems: [],
+      animals: false
+    }
   }
+
+  getClientsNames(itemId).then((boundedItems) => {
+    result.boundedItems = boundedItems;
+  }).catch(() => {
+    result.boundedItems = [];
+  }).finally(() => {
+    res.end(JSON.stringify(result));
+  })
 });
 
 // получение данных объявления для страницы личного кабинета
@@ -275,13 +180,43 @@ app.post("/item/delete", (req, res) => {
 app.post("/item/change", (req, res) => {
 
   const itemType = req.query.item; // house | person
-  const id = req.query.id; // house | person id
-  const field = req.body.field; // field name
+  const field = req.query.field; // field name
+  const id = req.body.id; // house | person id
   // Дом: address | metro | sex | money | type | smoking | animals | bounded-items
   // Человек: name | age | sex | money | attitude-toward-smoking | animals | bounded-items
   const value = req.body.value;
 
-  res.end();
+  if (field === "bounded-items") {
+    const clientObj = {
+      id: value.item.id,
+      name: value.item.login,
+      type: "client"
+    }
+    const rating = value.rating;
+
+    if (rating < 0) {
+      deleteConnection(clientObj.id, id).finally(() => {
+        res.end();
+      })
+    } else {
+      // временные
+      const list = new Map(Object.entries(itemType === "house" ? housesList : personsList).map((item) => {
+        return [item[1].id, item[1]]
+      }));
+      const obj = list.get(id);
+      const itemObj = {
+        id,
+        name: (itemType === "house") ? obj.address : obj.name,
+        type: itemType
+      }
+
+      addOrUpdateConnection(clientObj, itemObj, "relation", rating).finally(() => {
+        res.end();
+      })
+    }
+  } else {
+    res.end();
+  }
 })
 
 // Обработка входа

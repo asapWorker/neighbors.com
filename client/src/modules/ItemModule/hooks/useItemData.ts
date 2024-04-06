@@ -15,6 +15,7 @@ import { useIsLookingForData } from "../../../contexts/useUserContext";
 import { UserData } from "../../../hooks/useUserData";
 import { changeFieldData } from "../api/changeFieldData";
 import { deleteItemInfo } from "../api/deleteItem";
+import { BoundedItem } from "../types/BoundedItem";
 
 const REPLICATION = 3;
 
@@ -49,7 +50,7 @@ export const useItemData = (
   >(null);
 
   const [isChanged, setIsChanged] = useState<boolean>(true);
-  const [boundedItemsList, setBoundedItemsList] = useState<string[]>([]);
+  const [boundedItemsList, setBoundedItemsList] = useState<BoundedItem[]>([]);
 
   useEffect(() => {
     if (isPersonal) {

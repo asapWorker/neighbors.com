@@ -6,13 +6,14 @@ import { Text, TextType } from "../Text/Text";
 import { useEditableTextData } from "./hooks/useEditableTextData";
 import { Btn } from "../Btn/Btn";
 import { Stars } from "../Stars/Stars";
+import { BoundedItem } from "../../modules/ItemModule/types/BoundedItem";
 
 interface EditableTextProps {
   children: React.ReactNode;
   isEditable: boolean;
   saveChanges: (value: any) => boolean | null;
   isWithRating?: boolean;
-  options?: string[];
+  options?: BoundedItem[] | string[];
   isMultiple?: boolean;
   isNumber?: boolean;
   areMark?: boolean;
@@ -26,7 +27,7 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
   isMultiple = false,
   isWithRating = false,
   isNumber = false,
-  areMark = false
+  areMark = false,
 }) => {
   const {
     isEditing,
@@ -38,12 +39,13 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
     textChangeHandle,
     submitChange,
     resetChange,
-    ratingChangeHandle
+    ratingChangeHandle,
   } = useEditableTextData(
     Children.toArray(children)[1].toString(),
     saveChanges,
     isWithRating,
-    areMark
+    areMark,
+    options
   );
 
   if (isEditable && !isEditing) {
@@ -51,8 +53,12 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
       <div className={classnames(styles.str)}>
         <div className={styles["text-container"]}>
           {Children.toArray(children)[0]}
-          {!areMark && <Text type={TextType.Normal}>{value}</Text>}
-          {areMark && <Stars mark={rating}/>}
+          {!areMark && (
+            <Text type={TextType.Normal}>
+              {value}
+            </Text>
+          )}
+          {areMark && <Stars mark={rating} />}
         </div>
 
         <Btn onClickHandle={edit} style={styles.btn}>
@@ -70,7 +76,7 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
         </div>
 
         <div className={styles["input-container"]}>
-          {!options && (
+          {!options && typeof curValue === "string" && (
             <input
               onChange={textChangeHandle.bind(this)}
               className={styles["text-input"]}
@@ -93,12 +99,16 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
           {options && (
             <select
               multiple={isMultiple}
-              defaultValue={isMultiple ? [options[0]] : options[0]}
               className={styles.select}
               onChange={textChangeHandle.bind(this)}
             >
-              {options.map((item) => (
-                <option key={item}>{item}</option>
+              {options.map((item: BoundedItem | string, num: number) => (
+                <option
+                  value={num}
+                  key={typeof item === "string" ? item : item.id}
+                >
+                  {typeof item === "string" ? item : item.login}
+                </option>
               ))}
             </select>
           )}
