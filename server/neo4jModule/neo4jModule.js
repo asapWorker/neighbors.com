@@ -2,7 +2,7 @@ const neo4j = require('neo4j-driver');
 
 const uri = 'neo4j://localhost:7687';
 const user = 'neo4j';
-const password = 'neo4j';
+const password = 'default';
 
 
 /* создание или обновление связи между двумя узлами */
@@ -37,13 +37,39 @@ module.exports.addOrUpdateConnection = async (obj1, obj2, connectionType, rating
   } catch (error) {
     console.error(error);
   } finally {
-    await driver.close();
     await session.close();
+    await driver.close();
   }
+}
+
+/* обновление рейтинга связи между двумя узлами */
+module.exports.updateRating = async (clientId, itemId, rating)=>  {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  const session = driver.session();
+
+    try {
+        const result = await session.run(
+            'MATCH (client:Client {id: $clientId})-[r:RATING]->(item {id: $itemId}) SET r.rating = $rating RETURN client, item',
+            { clientId: clientId, itemId: itemId, rating: rating }
+        );
+
+        if (result.records.length === 0) {
+            throw new Error('Relationship not found');
+        }
+
+        return {
+            client: result.records[0].get('client').properties,
+            item: result.records[0].get('item').properties
+        };
+    } finally {
+      await session.close();
+      await driver.close();
+    }
 }
 
 /* удаление связи между узлами */
 module.exports.deleteConnection = async (id1, id2) => {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
   const session = driver.session();
 
   try {
@@ -67,11 +93,15 @@ module.exports.deleteConnection = async (id1, id2) => {
       console.error(`Error deleting connection: ${error}`);
   } finally {
     await session.close();
+    await driver.close();
   }
 }
 
 /* удаление узла */
 module.exports.deleteNode = async (id) => {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  const session = driver.session();
+
   try {
       const result = await session.run(
           `MATCH (n {id: $id})-[r]-(m)
@@ -91,26 +121,34 @@ module.exports.deleteNode = async (id) => {
       console.log(`Deleted orphan nodes`);
   } catch (error) {
       console.error(`Error deleting node: ${error}`);
+  } finally {
+    await session.close();
+    await driver.close();
   }
 }
 
 /* получение массива id объявлений для конкретного пользователя */
-module.exports.getItemsNames = async (clientId) => {
+module.exports.getItems = async (clientId) => {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  const session = driver.session();
+
   try {
       const result = await session.run(
-        `MATCH (client {id: $clientId})--(relatedNode)
-        RETURN relatedNode.name AS name`,
-        { clientId }
+          'MATCH (client:Client {id: $clientId})-[:CONNECTED_TO]->(item) RETURN item.id AS id, item.name AS name, labels(item)[0] AS type, client-[:RATING]->item AS rating',
+          { clientId: clientId }
       );
 
-      const itemsNames = result.records.map(record => record.get('name'));
-
-      return itemsNames;
-  } catch (error) {
-      console.error(`Error getting clients: ${error}`);
-      return [];
+      return result.records.map(record => ({
+          id: record.get('id'),
+          isPerson: record.get('type') === "person",
+          name: record.get('name'),
+          rating: record.get('rating')
+      }));
+  } finally {
+    await session.close();
+    await driver.close();
   }
-}
+};
 
 /* получение логинов клиентов для конкретного объявления */
 module.exports.getClientsNames = async (itemId) => {

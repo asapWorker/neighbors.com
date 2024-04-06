@@ -1,9 +1,4 @@
-export interface Mark {
-  isPerson: boolean;
-  mark: number;
-  name: string;
-  id: string;
-}
+import { Mark } from "../types/Mark";
 
 export async function getMarks(id: string) {
   try {

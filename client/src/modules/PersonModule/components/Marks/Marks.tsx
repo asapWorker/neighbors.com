@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 import { EditableText } from "../../../../UI/EditableText/EditableText";
 import { useMarksData } from "../../hooks/useMarksData";
 import styles from "./Marks.module.css";
-import { Mark } from "../../api/getMarks";
+import { Mark } from "../../types/Mark";
 import { Text, TextType } from "../../../../UI/Text/Text";
 
 interface MarksProps {

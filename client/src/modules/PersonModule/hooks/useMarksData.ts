@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { changeMark } from "../api/changeMark";
-import { Mark, getMarks } from "../api/getMarks";
+import { getMarks } from "../api/getMarks";
+import { Mark } from "../types/Mark";
 
 export const useMarksData = (id: string) => {
   const [defaultMarksList, setDefaultMarksList] = useState<Mark[] | null>(null);
