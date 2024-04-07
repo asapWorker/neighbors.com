@@ -1,8 +1,11 @@
+require('dotenv').config()
 // настройки express
 const express = require("express");
 cors = require("cors");
+const models = require('./models/models.js')
 const multer = require('multer');
 
+const sequelize = require('./db.js')
 const app = express();
 
 app.use(cors());
@@ -11,15 +14,22 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 const upload = multer();
+const e = require("express");
 
 
 const PORT = 8080;
 
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
+const start = async () => {
+  try {
+      await sequelize.authenticate()
+      await sequelize.sync()
+      app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
+  } catch (e) {
+      console.log(e)
+  }
+}
 
-
+start()
 
 // временные данные
 const { personsList, housesList, clients } = require("./tempData");
