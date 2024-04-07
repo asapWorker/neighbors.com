@@ -134,7 +134,10 @@ module.exports.getItems = async (clientId) => {
 
   try {
       const result = await session.run(
-          'MATCH (client:Client {id: $clientId})-[:CONNECTED_TO]->(item) RETURN item.id AS id, item.name AS name, labels(item)[0] AS type, client-[:RATING]->item AS rating',
+          `MATCH (client:Client {id: $clientId})-[:CONNECTED_TO]->(item)
+          OPTIONAL MATCH (client)-[r:RATING]->(item)
+          RETURN item.id AS id, item.name AS name, labels(item)[0] AS type, r.rating AS rating
+          `,
           { clientId: clientId }
       );
 

@@ -96,7 +96,8 @@ app.get("/item", (req, res) => {
 
 // получение данных объявления для страницы личного кабинета
 app.get("/person/item", (req, res) => {
-  const userId = req.query.id
+  const clientId = req.query.id
+  
 
   let answer = { // объявление для жилья в личном кабинете
     announcement: "house",

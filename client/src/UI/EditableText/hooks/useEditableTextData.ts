@@ -11,7 +11,7 @@ export const useEditableTextData = (
 ) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [curValue, setCurValue] = useState<string | string[] | BoundedItem>(options ? options[0] : "");
-  const [value, setValue] = useState<string | string[]>(defaultValue);
+  const [value, setValue] = useState<string>(defaultValue);
   const [curRating, setCurRating] = useState<number>(0);
   const [rating, setRating] = useState<number>(Number(defaultValue));
 
@@ -48,7 +48,9 @@ export const useEditableTextData = (
     if (curValue !== "") {
       if (isWithRating && typeof curValue !== "string" && !Array.isArray(curValue)) {
         if (value !== 'нет') {
-          setValue(value + ', ' + curValue.login);
+          const newValue = value.split(", ");
+          newValue.push(curValue.login);
+          setValue(Array.from(new Set(newValue)).join(", "));
         } else {
           setValue(curValue.login);
         }
@@ -58,7 +60,7 @@ export const useEditableTextData = (
         })
       } else if (typeof curValue !== "object") {
         if (Array.isArray(curValue)) {
-          setValue(curValue.join(', '));
+          setValue(Array.from(new Set(curValue)).join(', '));
         } else {
           setValue(curValue);
         }

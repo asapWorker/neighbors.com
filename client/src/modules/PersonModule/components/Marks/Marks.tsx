@@ -16,25 +16,29 @@ export const Marks: FunctionComponent<MarksProps> = ({ id }) => {
     return null;
   }
 
-  return <div className={styles.marks}>
-    <div className={styles.title}>Ваши оценки:</div>
-    <div className={styles["marks-container"]}>
-      {defaultMarksList.map((data: Mark, ind: number) => {
-        return (
-          <div key={ind}>
-            <EditableText
-              isEditable={true}
-              isWithRating={true}
-              saveChanges={markSaveHandle.bind(this, ind)}
-              options={[data.name]}
-              areMark={true}
-            >
-              <Text type={TextType.Normal}>{data.name}</Text>
-              {data.mark}
-            </EditableText>
-          </div>
-        );
-      })}
+  return (
+    <div className={styles.marks}>
+      <div className={styles.title}>Ваши оценки:</div>
+      <div className={styles["marks-container"]}>
+        {!defaultMarksList.length
+          ? <Text type={TextType.Normal}>нет</Text>
+          : defaultMarksList.map((data: Mark, ind: number) => {
+              return (
+                <div key={ind}>
+                  <EditableText
+                    isEditable={true}
+                    isWithRating={true}
+                    saveChanges={markSaveHandle.bind(this, ind)}
+                    options={[data.name]}
+                    areMark={true}
+                  >
+                    <Text type={TextType.Normal}>{data.name}</Text>
+                    {data.mark}
+                  </EditableText>
+                </div>
+              );
+            })}
+      </div>
     </div>
-  </div>;
+  );
 };
