@@ -65,7 +65,7 @@ const Cities = sequelize.define('cities', {
 
 const Region = sequelize.define('region', {
     id: {type:DataTypes.BIGINT, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.FLOAT},
+    name: {type: DataTypes.STRING},
 })
 
 const Address = sequelize.define('address', {
@@ -83,7 +83,6 @@ const Flat = sequelize.define('flat', {
 const House_announcement = sequelize.define('house_announcement', {
     id: {type:DataTypes.BIGINT, primaryKey: true, autoIncrement: true},
     payment: {type: DataTypes.BIGINT},
-    metro: {type: DataTypes.STRING},
 })
 
 Region.hasMany(Cities)
@@ -137,8 +136,9 @@ House_announcement.belongsTo(Smoking)
 Animals.hasOne(House_announcement)
 House_announcement.belongsTo(Animals)
 
-House_announcement.hasMany(Metro)
-Metro.belongsTo(House_announcement)
+Metro.hasOne(House_announcement)
+House_announcement.belongsTo(Metro)
+
 
 module.exports = {
     User,

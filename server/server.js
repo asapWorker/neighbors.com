@@ -1,8 +1,8 @@
 require('dotenv').config()
-// настройки express
 const express = require("express");
 cors = require("cors");
 const models = require('./models/models.js')
+const data = require('./models/data.js')
 const multer = require('multer');
 
 const sequelize = require('./db.js')
@@ -15,7 +15,6 @@ app.use(bodyParser.json());
 
 const upload = multer();
 const e = require("express");
-
 
 const PORT = 8080;
 
