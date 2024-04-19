@@ -208,7 +208,16 @@ const { User, User_announcement, User_gender, User_rating, Metro, House_announce
           const address = [
             {house_num: 82, flat: 10, regionId: 1, cityId: 1, street: 'Профсоюзная'},
             {house_num: 13, flat: 3, regionId: 1, cityId: 1, street: 'Черепановых'},
-            {house_num: 129, flat: 90, regionId: 1, cityId: 1, street: 'Московская'},
+            {house_num: 24, flat: 9, regionId: 1, cityId: 1, street: 'Московская'},
+            {house_num: 2, flat: 7, regionId: 1, cityId: 1, street: 'Академическая'},
+            {house_num: 112, flat: 25, regionId: 1, cityId: 1, street: 'проспект 60-летия Октября'},
+            {house_num: 72, flat: 90, regionId: 1, cityId: 1, street: 'Ленинский проспект'},
+            {house_num: 84, flat: 19, regionId: 1, cityId: 1, street: 'Профсоюзная'},
+            {house_num: 5, flat: 30, regionId: 1, cityId: 1, street: 'Светлый проезд'},
+            {house_num: 10, flat: 15, regionId: 1, cityId: 1, street: 'Волоколамское шоссе'},
+            {house_num: 18, flat: 17, regionId: 1, cityId: 1, street: 'Авангардная'},
+            {house_num: 25, flat: 64, regionId: 1, cityId: 1, street: 'Шипиловская'},
+            {house_num: 75, flat: 39, regionId: 1, cityId: 1, street: 'Профсоюзная'},
           ];
           for (const addresses of address) {
             const addres = await Address.create(addresses);

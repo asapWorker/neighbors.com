@@ -70,7 +70,7 @@ const Region = sequelize.define('region', {
 
 const Address = sequelize.define('address', {
     id: {type:DataTypes.BIGINT, primaryKey: true, autoIncrement: true},
-    street: {type: DataTypes.FLOAT},
+    street: {type: DataTypes.STRING},
     house_num: {type: DataTypes.BIGINT},
     flat: {type: DataTypes.BIGINT},
 })
