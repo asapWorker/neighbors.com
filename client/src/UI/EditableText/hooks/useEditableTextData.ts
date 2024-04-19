@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { YesNo } from "../../../constants/constants";
 import { BoundedItem } from "../../../modules/ItemModule/types/BoundedItem";
 
 export const useEditableTextData = (
@@ -10,7 +9,9 @@ export const useEditableTextData = (
   options: string[] | BoundedItem[]
 ) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [curValue, setCurValue] = useState<string | string[] | BoundedItem>(options ? options[0] : "");
+  const [curValue, setCurValue] = useState<string | BoundedItem>(
+    options ? options[0] : ""
+  );
   const [value, setValue] = useState<string>(defaultValue);
   const [curRating, setCurRating] = useState<number>(0);
   const [rating, setRating] = useState<number>(Number(defaultValue));
@@ -19,55 +20,75 @@ export const useEditableTextData = (
     setIsEditing(true);
   }, []);
 
-  const textChangeHandle = useCallback((event: any) => {
-    if (event.target.selectedOptions) {
-      const arr = Array.from(event.target.selectedOptions, (option: any) => option.value);
-
-      if (isWithRating) {
+  const textChangeHandle = useCallback(
+    (event: any) => {
+      if (event.target.selectedOptions) {
+        const arr = Array.from(
+          event.target.selectedOptions,
+          (option: any) => option.value
+        );
         setCurValue(options[parseInt(arr[0])]);
       } else {
-        setCurValue(arr);
+        setCurValue(event.target.value);
       }
-    } else {
-      setCurValue(event.target.value);
-    }
-  }, [setCurValue, isWithRating, options]);
+    },
+    [setCurValue, isWithRating, options]
+  );
 
-  const ratingChangeHandle = useCallback((event: any) => {
-    let val = event.target.value;
-    if ((areMark && val < 0) || (areMark && val < -1)) {
-      val = areMark ? 0 : -1
-    } else if (val > 5) {
-      val = 5
-    }
-    
-    setCurRating(val);
-  }, [setCurRating])
+  const ratingChangeHandle = useCallback(
+    (event: any) => {
+      let val = event.target.value;
+      if ((areMark && val < 0) || (areMark && val < -1)) {
+        val = areMark ? 0 : -1;
+      } else if (val > 5) {
+        val = 5;
+      }
+
+      setCurRating(val);
+    },
+    [setCurRating]
+  );
 
   const submitChange = useCallback(() => {
     if (curValue !== "") {
-      if (isWithRating && typeof curValue !== "string" && !Array.isArray(curValue)) {
-        if (value !== 'нет') {
-          const newValue = value.split(", ");
-          newValue.push(curValue.login);
-          setValue(Array.from(new Set(newValue)).join(", "));
+      
+      if (!areMark) {
+        const isConfirmed = confirm(
+          isWithRating && curRating < 0
+            ? "Вы действительно хотите удалить эту связь"
+            : "Вы действительно хотите изменить значение поля?"
+        );
+        if (!isConfirmed) return false;
+      }
+
+      if (areMark) {
+        setRating(curRating);
+        saveChanges(curRating);
+        
+      } else if (isWithRating && typeof curValue !== "string") {
+        if (value !== "нет") {
+          const newValue = new Set(value.split(", "));
+
+          if (curRating < 0) {
+            if (newValue.has(curValue.login)) {
+              newValue.delete(curValue.login);
+            }
+          } else {
+            newValue.add(curValue.login);
+          }
+          setValue(Array.from(newValue).join(", "));
         } else {
           setValue(curValue.login);
         }
         saveChanges({
           item: curValue,
-          rating: curRating
-        })
+          rating: curRating,
+        });
       } else if (typeof curValue !== "object") {
-        if (Array.isArray(curValue)) {
-          setValue(Array.from(new Set(curValue)).join(', '));
-        } else {
-          setValue(curValue);
-        }
-        
+        setValue(curValue);
         saveChanges(curValue);
       }
-      
+
       setIsEditing(false);
     } else if (isWithRating && curRating) {
       if (saveChanges(curRating)) {
@@ -91,6 +112,6 @@ export const useEditableTextData = (
     textChangeHandle,
     submitChange,
     resetChange,
-    ratingChangeHandle
+    ratingChangeHandle,
   };
 };

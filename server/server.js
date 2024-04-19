@@ -36,7 +36,7 @@ const { personsList, housesList, clients } = require("./tempData");
 
 
 //neo4j
-const { getClientsNames, addOrUpdateConnection, updateRating, deleteConnection, getItems } = require("./neo4jModule/neo4jModule");
+const { getClientsNames, addOrUpdateConnection, updateRating, deleteConnection, getItems, deleteNode, getActiveItem } = require("./neo4jModule/neo4jModule");
 
 
 
@@ -105,19 +105,27 @@ app.get("/item", (req, res) => {
 
 // получение данных объявления для страницы личного кабинета
 app.get("/person/item", (req, res) => {
-  const clientId = req.query.id
-  
+  const clientId = req.query.id;
 
-  let answer = { // объявление для жилья в личном кабинете
-    announcement: "house",
-    type: "Dorm",
-    id: "6",
-    address: "Профсоюзная 104а",
-    sex: "Female",
-    metro: ["Коньково", "Беляево", "Комсомольская"],
-    money: 2200,
-    animals: true
-  }
+  getActiveItem(clientId).then((itemData) => {
+    if (!itemData) {
+      res.end(JSON.stringify(null));
+    } else {
+      // временный код
+      let answer = { // объявление для жилья в личном кабинете
+        announcement: "house",
+        type: "Dorm",
+        id: "6",
+        address: "Профсоюзная 104а",
+        sex: "Female",
+        metro: ["Коньково", "Беляево", "Комсомольская"],
+        money: 2200,
+        animals: true
+      }
+
+      res.end(JSON.stringify(answer));
+    }
+  })
 
   /*
   {
@@ -131,7 +139,6 @@ app.get("/person/item", (req, res) => {
   }
   */
 
-  res.end(JSON.stringify(answer));
 })
 
 // получение списка оценок жилья и людей конкретного пользователя
@@ -150,7 +157,38 @@ app.post("/item/delete", (req, res) => {
   const itemType = req.query.item; // house | person
   const itemId = req.query.id;
 
-  res.end();
+  deleteNode(itemId).then(() => {
+    res.end();
+  })
+  
+})
+
+
+// выбор объявления
+app.post("/item/choose", upload.any(), (req, res) => {
+  const itemType = req.query.type; // house | person
+
+  const userData = req.body.user;
+  const itemData = req.body.itemData;
+
+  // временный код
+  const userName = new Map(clients.map((c) => [c.id, c.login])).get(userData.id);
+
+  const clientObj = {
+    id: userData.id,
+    name: userName,
+    type: "client"
+  }
+
+  const itemObj = {
+    id: itemData.id,
+    name: (itemType === "house") ? itemData.address : itemData.name,
+    type: itemType
+  }
+
+  addOrUpdateConnection(clientObj, itemObj, "relation", 0, true).then(() => {
+    res.end();
+  })
 })
 
 // изменение поля
@@ -158,7 +196,7 @@ app.post("/item/change", upload.any(), (req, res) => {
 
   const itemType = req.query.item; // house | person
   const field = req.query.field; // field name
-  const id = req.body.id; // house | person id
+  const itemData = req.body.itemData; // item
   // Дом: address | metro | sex | money | type | smoking | animals | bounded-items
   // Человек: name | age | sex | money | attitude-toward-smoking | animals | bounded-items
   const value = req.body.value;
@@ -171,26 +209,16 @@ app.post("/item/change", upload.any(), (req, res) => {
     }
     const rating = value.rating;
 
-    if (rating < 0) {
-      deleteConnection(clientObj.id, id).finally(() => {
-        res.end();
-      })
-    } else {
-      // временные
-      const list = new Map(Object.entries(itemType === "house" ? housesList : personsList).map((item) => {
-        return [item[1].id, item[1]]
-      }));
-      const obj = list.get(id);
-      const itemObj = {
-        id,
-        name: (itemType === "house") ? obj.address : obj.name,
-        type: itemType
-      }
-
-      addOrUpdateConnection(clientObj, itemObj, "relation", rating).finally(() => {
-        res.end();
-      })
+    const itemObj = {
+      id: itemData.id,
+      name: (itemType === "house") ? itemData.address : itemData.name,
+      type: itemType
     }
+
+    addOrUpdateConnection(clientObj, itemObj, "relation", rating).finally(() => {
+      res.end();
+    })
+
   } else {
     res.end();
   }
@@ -203,12 +231,12 @@ app.post("/enter", upload.any(), (req, res) => {
 
   if (login === "admin") {
     res.end(JSON.stringify({
-      id: "11",
+      id: "111",
       type: "Admin"
     }))
   } else if (login === "client") {
     res.end(JSON.stringify({
-      id: "22",
+      id: "222",
       type: "Client",
       house: true,
       person: false

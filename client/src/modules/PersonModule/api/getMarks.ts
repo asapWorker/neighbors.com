@@ -10,7 +10,10 @@ export async function getMarks(id: string) {
       },
     );
 
-    const marks: Mark[] = await response.json();
+    const res = await response.json();
+    const marks: Mark[] = res.map((item: any) => {
+      return {id: item.id, name: item.name, isPerson: item.isPerson, mark: item.rating}
+    })
 
     return marks;
 

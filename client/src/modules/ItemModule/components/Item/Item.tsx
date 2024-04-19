@@ -21,6 +21,7 @@ import {
   PersonalHouseItem,
   PersonalPersonItem,
 } from "../../../../types/ItemTypes";
+import { Spinner } from "../../../../UI/Spinner/Spinner";
 
 type ItemProps = {
   type: string;
@@ -55,7 +56,9 @@ export const Item: FunctionComponent<ItemProps> = ({
   } = useItemData(user, type, baseData, isPersonal, reportDeletion);
 
   if (!itemData) {
-    return null;
+    return <div className={styles.item}>
+      <Spinner/>
+    </div>
   }
 
   return (
@@ -151,7 +154,6 @@ export const Item: FunctionComponent<ItemProps> = ({
             isEditable={isEditable}
             saveChanges={setNewData.bind(this, "metro")}
             options={Metros}
-            isMultiple={true}
           >
             <Text type={TextType.Bold}>Метро:</Text>
             {itemData.metro}

@@ -1,3 +1,4 @@
+const { query } = require('express');
 const neo4j = require('neo4j-driver');
 
 const uri = 'neo4j://localhost:7687';
@@ -6,39 +7,68 @@ const password = 'default';
 
 
 /* создание или обновление связи между двумя узлами */
-module.exports.addOrUpdateConnection = async (obj1, obj2, connectionType, rating) => {
+
+module.exports.addOrUpdateConnection = async (obj1, obj2, connectionType, rating, makeActive = false) => {
   const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
   const session = driver.session();
 
   try {
-    const result1 = await session.run(
-      'MERGE (n1:' + obj1.type + ' {id: $id1, name: $name}) RETURN n1',
-      { id1: obj1.id, name: obj1.name }
-    );
+      const result1 = await session.run(
+          'MERGE (client:' + obj1.type + ' {id: $id1, name: $name}) RETURN client',
+          { id1: obj1.id, name: obj1.name }
+      );
 
-    const result2 = await session.run(
-      'MERGE (n2:' + obj2.type + ' {id: $id2, name: $name}) RETURN n2',
-      { id2: obj2.id, name: obj2.name }
-    );
+      const result2 = await session.run(
+          'MERGE (item:' + obj2.type + ' {id: $id2, name: $name}) RETURN item',
+          { id2: obj2.id, name: obj2.name }
+      );
 
-    const node1Id = result1.records[0].get('n1').identity.low;
-    const node2Id = result2.records[0].get('n2').identity.low;
+      const node1Id = result1.records[0].get('client').identity.low;
+      const node2Id = result2.records[0].get('item').identity.low;
 
-    const result = await session.run(
-      'MATCH (n1), (n2) WHERE ID(n1) = $node1Id AND ID(n2) = $node2Id ' +
-      'MERGE (n1)-[r:' + connectionType + ']->(n2) ' +
-      'ON CREATE SET r.rating = $rating ' +
-      'ON MATCH SET r.rating = $rating ' +
-      'RETURN r',
-      { node1Id, node2Id, rating }
-    );
+      let query;
+      let params = {
+          node1Id: node1Id,
+          node2Id: node2Id,
+          connectionType: connectionType,
+          rating: rating
+      };
 
-    console.log(result.records[0].get('r').properties);
+      if (rating >= 0) {
+          if (makeActive) {
+            query = 
+              'MATCH (n1), (n2) WHERE ID(n1) = $node1Id AND ID(n2) = $node2Id ' +
+              'MERGE (n1)-[r:' + connectionType + '{isActive: true}]->(n2) ' +
+              'ON CREATE SET r.rating = $rating ' +
+              'ON MATCH SET r.rating = $rating ' +
+              'RETURN r';
+          } else {
+            query = 
+              'MATCH (n1), (n2) WHERE ID(n1) = $node1Id AND ID(n2) = $node2Id ' +
+              'MERGE (n1)-[r:' + connectionType + ']->(n2) ' +
+              'ON CREATE SET r.rating = $rating ' +
+              'ON MATCH SET r.rating = $rating ' +
+              'RETURN r';
+          }
+
+          const result = await session.run(query, params);
+
+          console.log(result.records[0].get('r').properties);
+      } else {
+        const result = await session.run(
+          `MATCH (client {id: $id1})-[r]-(item {id: $id2})
+          DELETE r`,
+          { id1: obj1.id, id2: obj2.id }
+        );
+
+        console.log(`Deleted connection between nodes with id ${obj1.id} and ${obj2.id}`);
+      }
+
   } catch (error) {
-    console.error(error);
+      console.error(error);
   } finally {
-    await session.close();
-    await driver.close();
+      await session.close();
+      await driver.close();
   }
 }
 
@@ -47,24 +77,29 @@ module.exports.updateRating = async (clientId, itemId, rating)=>  {
   const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
   const session = driver.session();
 
-    try {
-        const result = await session.run(
-            'MATCH (client:Client {id: $clientId})-[r:RATING]->(item {id: $itemId}) SET r.rating = $rating RETURN client, item',
-            { clientId: clientId, itemId: itemId, rating: rating }
-        );
+  try {
+    const query = 
+      'MATCH (n1), (n2) WHERE n1.id = $clientId AND n2.id = $itemId ' +
+      'MERGE (n1)-[r:relation]->(n2) ' +
+      'ON CREATE SET r.rating = $rating ' +
+      'ON MATCH SET r.rating = $rating ' +
+      'RETURN r'
+    ;
 
-        if (result.records.length === 0) {
-            throw new Error('Relationship not found');
-        }
+    const result = await session.run(
+        query,
+        { clientId: clientId, itemId: itemId, rating: rating }
+    );
 
-        return {
-            client: result.records[0].get('client').properties,
-            item: result.records[0].get('item').properties
-        };
-    } finally {
-      await session.close();
-      await driver.close();
+    if (result.records.length === 0) {
+        throw new Error('Relationship not found');
+    } else {
+      console.log("Rating changing is done")
     }
+  } finally {
+    await session.close();
+    await driver.close();
+  }
 }
 
 /* удаление связи между узлами */
@@ -73,29 +108,22 @@ module.exports.deleteConnection = async (id1, id2) => {
   const session = driver.session();
 
   try {
-      const result = await session.run(
-        `MATCH (n1 {id: $id1})-[r]-(n2 {id: $id2})
-        DELETE r`,
-        { id1, id2 }
-      );
+    const result = await session.run(
+      `MATCH (client:client {id: $id1})-[r]->(item {id: $id2})
+      SET r.isActive = false
+      RETURN r`,
+      { id1: id1, id2: id2 }
+    );
 
-      console.log(`Deleted connection between nodes with id ${id1} and ${id2}`);
-
-      // Удаление узлов, которые не связаны ни с каким другим узлом
-      const deleteOrphanNodesResult = await session.run(
-        `MATCH (n)
-        WHERE NOT (n)--()
-        DELETE n`
-      );
-
-      console.log(`Deleted orphan nodes`);
+      console.log(result.records[0].get('r').properties);
   } catch (error) {
-      console.error(`Error deleting connection: ${error}`);
+      console.error(error);
   } finally {
-    await session.close();
-    await driver.close();
+      await session.close();
+      await driver.close();
   }
 }
+
 
 /* удаление узла */
 module.exports.deleteNode = async (id) => {
@@ -104,28 +132,23 @@ module.exports.deleteNode = async (id) => {
 
   try {
       const result = await session.run(
-          `MATCH (n {id: $id})-[r]-(m)
-          DELETE n, r, m`,
-          { id }
+        `MATCH (client:client)-[r]->(item {id: $id})
+        SET r.isActive = false
+        RETURN r`,
+        { id: id }
       );
 
-      console.log(`Deleted node with id ${id} and its connections`);
-
-      // Удаление узлов, которые не связаны ни с каким другим узлом
-      const deleteOrphanNodesResult = await session.run(
-          `MATCH (n)
-          WHERE NOT (n)--()
-          DELETE n`
-      );
-
-      console.log(`Deleted orphan nodes`);
+      result.records.forEach(record => {
+          console.log(record.get('r').properties);
+      });
   } catch (error) {
-      console.error(`Error deleting node: ${error}`);
+      console.error(error);
   } finally {
-    await session.close();
-    await driver.close();
+      await session.close();
+      await driver.close();
   }
 }
+
 
 /* получение массива id объявлений для конкретного пользователя */
 module.exports.getItems = async (clientId) => {
@@ -134,18 +157,16 @@ module.exports.getItems = async (clientId) => {
 
   try {
       const result = await session.run(
-          `MATCH (client:Client {id: $clientId})-[:CONNECTED_TO]->(item)
-          OPTIONAL MATCH (client)-[r:RATING]->(item)
-          RETURN item.id AS id, item.name AS name, labels(item)[0] AS type, r.rating AS rating
-          `,
-          { clientId: clientId }
+        `MATCH (c:client {id: $clientId})-[r:relation]->(i)
+        RETURN i.id AS id, i.type AS type, i.name AS name, r.rating AS rating`,
+        { clientId }
       );
 
       return result.records.map(record => ({
-          id: record.get('id'),
-          isPerson: record.get('type') === "person",
-          name: record.get('name'),
-          rating: record.get('rating')
+        id: record.get('id'),
+        isPerson: record.get('type') === "person",
+        name: record.get('name'),
+        rating: record.get('rating')
       }));
   } finally {
     await session.close();
@@ -186,3 +207,28 @@ module.exports.getClientsNames = async (itemId) => {
     }
   }
 }
+
+/* получение активного объявления для клиента */
+module.exports.getActiveItem = async (clientId) => {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  const session = driver.session();
+
+  try {
+    const result = await session.run(
+      `MATCH (client:client {id: $clientId})-[r:relation]->(item)
+      WHERE (item:house OR item:person) AND r.isActive = true
+      RETURN {id: ID(item), type: labels(item)[0]} as activeItem`,
+      { clientId })
+
+    if (result.records.length === 0) {
+      return null;
+    }
+  
+    const activeItem = result.records[0].get('activeItem');
+    return activeItem;
+
+  } finally {
+    await session.close();
+    await driver.close();
+  }
+};

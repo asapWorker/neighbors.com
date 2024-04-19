@@ -19,10 +19,16 @@ export const useUserData = () => {
     setIsLookingForPerson(isLookingForPerson);
   }, [])
 
+  const resetIsLookingFor = useCallback(() => {
+    setIsLookingForHouse(false);
+    setIsLookingForPerson(false);
+  }, [])
+
   return {
     user,
     isLookingForHouse,
     isLookingForPerson,
+    resetIsLookingFor,
     changeUser
   }
 }

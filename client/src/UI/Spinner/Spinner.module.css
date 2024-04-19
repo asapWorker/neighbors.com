@@ -1,0 +1,29 @@
+.loader {
+  width: 3vmin;
+  height: 3vmin;
+  border-radius: 50%;
+  background-color: #555555;
+  box-shadow: 6vmin 0 #fff, -6vmin 0 #fff;
+
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  animation: flash 0.7s ease-out infinite alternate;
+}
+  
+@keyframes flash {
+  0% {
+    background-color: #555555;
+    box-shadow: 6vmin 0 #555555, -6vmin 0 #FFF;
+  }
+  50% {
+    background-color: #FFF;
+    box-shadow: 6vmin 0 #555555, -6vmin 0 #555555;
+  }
+  100% {
+    background-color: #555555;
+    box-shadow: 6vmin 0 #FFF, -6vmin 0 #555555;
+  }
+}

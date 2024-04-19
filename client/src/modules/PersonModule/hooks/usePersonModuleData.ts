@@ -9,6 +9,7 @@ import { getPersonalItemData } from "../api/getPersonalItemData";
 
 export const usePersonModuleData = () => {
   const user = useUser();
+
   const [baseData, setBaseData] = useState<
     PersonalHouseItem | PersonalPersonItem
   >(null);

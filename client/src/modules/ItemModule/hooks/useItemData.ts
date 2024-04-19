@@ -11,11 +11,12 @@ import {
   YesNo,
 } from "../../../constants/constants";
 import { getBoundedItemsList } from "../api/getBoundedItemsList";
-import { useIsLookingForData } from "../../../contexts/useUserContext";
+import { useIsLookingForData, useResetIsLookingFor } from "../../../contexts/useUserContext";
 import { UserData } from "../../../hooks/useUserData";
 import { changeFieldData } from "../api/changeFieldData";
 import { deleteItemInfo } from "../api/deleteItem";
 import { BoundedItem } from "../types/BoundedItem";
+import { chooseItem } from "../api/chooseItem";
 
 const REPLICATION = 3;
 
@@ -44,6 +45,7 @@ export const useItemData = (
   const navigate = useNavigate();
 
   const { isLookingForHouse, isLookingForPerson } = useIsLookingForData();
+  const { resetIsLookingFor } = useResetIsLookingFor();
 
   const [itemData, setItemData] = useState<
     ExtendedHouseItem | ExtendedPersonItem | BaseHouseItem | BasePersonItem
@@ -119,13 +121,8 @@ export const useItemData = (
 
   const setNewData = useCallback(
     (field: string, value: any) => {
-      const isConfirmed = confirm(
-        "Вы действительно хотите изменить значение поля?"
-      );
-      if (!isConfirmed) return;
-
       if (itemData) {
-        changeFieldData(type, itemData.id, field, value).finally(() => {
+        changeFieldData(type, itemData, field, value).finally(() => {
           setIsChanged(true);
         });
       }
@@ -143,6 +140,9 @@ export const useItemData = (
       deleteItemInfo(type, itemData.id).finally(() => {
         setItemData(null);
         reportDeletion();
+
+        resetIsLookingFor();
+
         
         if (!isPersonal) {
           navigate("..");
@@ -157,8 +157,11 @@ export const useItemData = (
     );
     if (!isConfirmed) return;
 
-    navigate("..");
-  }, []);
+    chooseItem(user, type, itemData).then(() => {
+      resetIsLookingFor();
+      navigate("..");
+    })
+  }, [itemData]);
 
   return {
     isEditable: user?.type === User.Admin || isPersonal,

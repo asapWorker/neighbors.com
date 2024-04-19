@@ -12,6 +12,7 @@ interface UserContextType {
   ) => void;
   isLookingForHouse: boolean;
   isLookingForPerson: boolean;
+  resetIsLookingFor: () => void;
 }
 
 interface UserContextProviderProps extends UserContextType {
@@ -38,12 +39,16 @@ export const useChangeUser = () => {
   return { changeUser: useContext(UserContext).changeUser };
 };
 
+export const useResetIsLookingFor = () => {
+  return { resetIsLookingFor: useContext(UserContext).resetIsLookingFor }
+}
+
 export const UserContextProvider: FunctionComponent<
   UserContextProviderProps
-> = ({ children, user, isLookingForHouse, isLookingForPerson, changeUser }) => {
+> = ({ children, user, isLookingForHouse, isLookingForPerson, changeUser, resetIsLookingFor }) => {
   return (
     <UserContext.Provider
-      value={{ user, isLookingForHouse, isLookingForPerson, changeUser }}
+      value={{ user, isLookingForHouse, isLookingForPerson, changeUser, resetIsLookingFor }}
     >
       {children}
     </UserContext.Provider>

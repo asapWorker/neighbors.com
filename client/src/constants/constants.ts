@@ -14,15 +14,16 @@ export enum Sex {
 
 export const enum SortBy {
   Ascending = "по возрастанию",
-  Decending = "по убываю",
+  Decending = "по убыванию",
 }
 
 /* house types */
 export enum HouseType {
+  Flat = "квартира",
+  StudioFlat = "студия",
+  Cottage = "загородный дом",
   Dorm = "общежитие",
-  Apartment = "квартира",
-  CommunalApartment = "коммуналка",
-  PrivateHouse = "частный дом",
+  CommunalFlat = "коммуналка"
 }
 
 /* person attitude toward smoking */
@@ -43,10 +44,11 @@ export const sexes = [Sex.Any, Sex.Male, Sex.Female];
 export const personSexes = [Sex.Male, Sex.Female];
 
 export const houseTypes = [
+  HouseType.Flat,
+  HouseType.StudioFlat,
+  HouseType.Cottage,
   HouseType.Dorm,
-  HouseType.Apartment,
-  HouseType.CommunalApartment,
-  HouseType.PrivateHouse,
+  HouseType.CommunalFlat
 ];
 
 export const attitudesTowardSmoking = [
@@ -61,9 +63,19 @@ export const YesNoAnswers = [
 ]
 
 export const Metros = [
-  "Беляево",
-  "Октябрьская",
-  "Новые Черемушки",
-  "Теплый Стан",
-  "Комсомольская"
+  "Сокольники",
+  "Комсомольская",
+  "Ховрино",
+  "Беломорская", 
+  "Беляево", 
+  "Октябрькая",
+  "Академическая", 
+  "ВДНХ", 
+  "Речной вокзал", 
+  "Домодедовская", 
+  "Орехово", 
+  "Люблино", 
+  "Крымская", 
+  "Коммунарка", 
+  "Стрешнево"
 ]
