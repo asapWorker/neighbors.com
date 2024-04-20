@@ -1,10 +1,19 @@
 const db = require('../db')
 
-class UserController{
-    async getAddresses(req, res){
-        const address = await db.query('SELECT * FROM addresses')
-        res.json(address.rows)
-    }
+async function getAddresses(req, res){
+    const address = await db.query('SELECT * FROM addresses')
+    return address
 }
 
-module.exports = new UserController()
+async function fetchData() {
+    try {
+      const addresses = await getAddresses();
+      console.log('Результаты запроса:', addresses);
+    } catch (error) {
+      console.error('Ошибка выполнения запроса:', error);
+    } finally {
+      client.end();
+    }
+  }
+
+fetchData();
