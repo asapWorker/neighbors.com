@@ -5,10 +5,14 @@ const models = require("./models/models.js");
 const data = require("./models/data.js");
 const multer = require("multer");
 
+const userRouter = require('./postgresql/pgroutes.js')
+
 const sequelize = require("./db.js");
 const app = express();
 
 app.use(cors());
+
+app.use('/api', userRouter)
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
