@@ -57,8 +57,16 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
+  getAddresses().then((res) => {
+    console.log(res);
+  })
+  getUsers().then((res) => {
+    console.log(res);
+  })
+  getUsersInfo().then((res) => {
+    console.log(res);
+  })
   res.setHeader("Content-Type", "application/json");
-
   if (req.query.target === "person-list") {
     res.end(JSON.stringify(personsList)); // см. personsList
   } else {
@@ -68,9 +76,6 @@ app.get("/", (req, res) => {
 
 // получение списка логинов, id клиентов
 app.get("/bounded", (req, res) => {
-  getUsersInfo().then((res) => {
-    console.log(res);
-  })
   res.setHeader("Content-Type", "application/json");
 
   res.end(
