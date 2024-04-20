@@ -122,7 +122,17 @@ export const useItemData = (
   const setNewData = useCallback(
     (field: string, value: any) => {
       if (itemData) {
-        changeFieldData(type, itemData, field, value).finally(() => {
+        changeFieldData(type, itemData, field, value).then((res) => {
+          if (field === "bounded-items") {
+
+            setItemData(prev => {
+              return {
+                ...prev,
+                mark: res
+              }
+            })
+            
+          }
           setIsChanged(true);
         });
       }
@@ -158,7 +168,6 @@ export const useItemData = (
     if (!isConfirmed) return;
 
     chooseItem(user, type, itemData).then(() => {
-      resetIsLookingFor();
       navigate("..");
     })
   }, [itemData]);

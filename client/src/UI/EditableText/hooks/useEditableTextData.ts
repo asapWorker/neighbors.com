@@ -37,7 +37,7 @@ export const useEditableTextData = (
 
   const ratingChangeHandle = useCallback(
     (event: any) => {
-      let val = event.target.value;
+      let val = Number(event.target.value);
       if ((areMark && val < 0) || (areMark && val < -1)) {
         val = areMark ? 0 : -1;
       } else if (val > 5) {

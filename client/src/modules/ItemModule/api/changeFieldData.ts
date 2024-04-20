@@ -15,7 +15,8 @@ export async function changeFieldData(item: string, itemData: any, field: string
       },
     );
 
-    return true;
+    const res = response.json();
+    return res;
 
   } catch {
     console.log("не удается изменить поле");

@@ -102,28 +102,6 @@ module.exports.updateRating = async (clientId, itemId, rating)=>  {
   }
 }
 
-/* удаление связи между узлами */
-module.exports.deleteConnection = async (id1, id2) => {
-  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
-  const session = driver.session();
-
-  try {
-    const result = await session.run(
-      `MATCH (client:client {id: $id1})-[r]->(item {id: $id2})
-      SET r.isActive = false
-      RETURN r`,
-      { id1: id1, id2: id2 }
-    );
-
-      console.log(result.records[0].get('r').properties);
-  } catch (error) {
-      console.error(error);
-  } finally {
-      await session.close();
-      await driver.close();
-  }
-}
-
 
 /* удаление узла */
 module.exports.deleteNode = async (id) => {
@@ -173,6 +151,7 @@ module.exports.getItems = async (clientId) => {
     await driver.close();
   }
 };
+
 
 /* получение логинов клиентов для конкретного объявления */
 module.exports.getClientsNames = async (itemId) => {
@@ -232,3 +211,59 @@ module.exports.getActiveItem = async (clientId) => {
     await driver.close();
   }
 };
+
+/* получение оценок для конкретного объявления*/
+module.exports.getMarks = async (itemId) => {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  const session = driver.session();
+
+  try {
+    const result = await session.run(
+      `MATCH (client:client)-[r:relation]->(item {id: $itemId})
+       RETURN r.rating AS rating`,
+      { itemId }
+    );
+
+    if (result.records.length === 0) return [];
+
+    const marks = result.records.map(record => record.get('rating'));
+
+    return marks;
+  } catch (error) {
+    console.error(`Error getting Marks: ${error.message}`);
+    return [];
+  } finally {
+    try {
+      await session.close();
+    } catch (error) {
+      console.error(`Error closing session: ${error.message}`);
+    }
+    try {
+      await driver.close();
+    } catch (error) {
+      console.error(`Error closing driver: ${error.message}`);
+    }
+  }
+}
+
+/* удаление связи между узлами */
+module.exports.deleteConnection = async (id1, id2) => {
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+  const session = driver.session();
+
+  try {
+    const result = await session.run(
+      `MATCH (client:client {id: $id1})-[r]->(item {id: $id2})
+      SET r.isActive = false
+      RETURN r`,
+      { id1: id1, id2: id2 }
+    );
+
+      console.log(result.records[0].get('r').properties);
+  } catch (error) {
+      console.error(error);
+  } finally {
+      await session.close();
+      await driver.close();
+  }
+}
