@@ -37,6 +37,8 @@ const { personsList, housesList, clients } = require("./tempData");
 
 // postgresql
 
+const { getAddresses } = require("./postgresql/pgreq.js");
+
 // neo4j
 const {
   getClientsNames,
@@ -55,6 +57,11 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
+  getAddresses().then((res) => {
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
+    console.log(res);
+})
+
   res.setHeader("Content-Type", "application/json");
 
   if (req.query.target === "person-list") {
