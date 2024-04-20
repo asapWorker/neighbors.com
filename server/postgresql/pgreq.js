@@ -12,5 +12,5 @@ module.exports.getUsers = async function() {
 
 module.exports.getUsersInfo = async function() {
     const result = await db.query('SELECT id, login FROM users');
-    return JSON.stringify(result);
+    return JSON.stringify(result[0]);
 };
