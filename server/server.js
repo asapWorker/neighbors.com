@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 cors = require("cors");
 const models = require("./models/models.js");
-const data = require("./models/data.js");
+//const data = require("./models/data.js");
 const multer = require("multer");
 
 const sequelize = require("./db.js");
@@ -37,7 +37,7 @@ const { personsList, housesList, clients } = require("./tempData");
 
 // postgresql
 
-const { getAddresses } = require("./postgresql/pgreq.js");
+const { getAddresses, getUsers, getUsersInfo} = require("./postgresql/pgreq.js");
 
 // neo4j
 const {
@@ -57,11 +57,6 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-  getAddresses().then((res) => {
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
-    console.log(res);
-})
-
   res.setHeader("Content-Type", "application/json");
 
   if (req.query.target === "person-list") {
@@ -73,6 +68,9 @@ app.get("/", (req, res) => {
 
 // получение списка логинов, id клиентов
 app.get("/bounded", (req, res) => {
+  getUsersInfo().then((res) => {
+    console.log(res);
+  })
   res.setHeader("Content-Type", "application/json");
 
   res.end(
