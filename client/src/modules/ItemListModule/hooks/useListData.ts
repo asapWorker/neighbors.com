@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { HouseItem } from "../types/houseType";
 import { PersonItem } from "../types/personType";
-import { getShortHousesInfo, getShortPersonsInfo } from "../api/getShortInfo";
 import { FilterSettings } from "../../../types/FilterSettings";
 import { Sex, SortBy } from "../../../constants/constants";
+import { getShortInfos } from "../api/getShortInfo";
 
 const REPLICATION = 3;
 
@@ -23,21 +23,13 @@ export const useListData = () => {
   const [personList, setPersonList] = useState<PersonItem[]>(null);
 
   useEffect(() => {
-    getList(getShortHousesInfo)
-      .then((list) => {
-        setHouseList(list);
-      })
-      .catch(() => {
-        setHouseList(null);
-      });
-
-    getList(getShortPersonsInfo)
-      .then((list) => {
-        setPersonList(list);
-      })
-      .catch(() => {
-        setPersonList(null);
-      });
+    getShortInfos().then((lists) => {
+      setPersonList(lists[0]);
+      setHouseList(lists[1]);
+    }).catch(() => {
+      setPersonList(null);
+      setHouseList(null);
+    })
   }, []);
 
   const sort = useCallback((settings: FilterSettings, list: any[]) => {

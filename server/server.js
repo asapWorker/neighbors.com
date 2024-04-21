@@ -36,8 +36,7 @@ const { personsList, housesList, clients } = require("./tempData");
 /* Функции для запросов к бд ---------------------------------*/
 
 // postgresql
-
-const { getAddresses, getUsers, getUsersInfo} = require("./postgresql/pgreq.js");
+const { getHouses, getUsers, getUsersInfo} = require("./postgresql/pgreq.js");
 
 // neo4j
 const {
@@ -57,37 +56,25 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-  getAddresses().then((res) => {
-    console.log(res);
-  })
-  getUsers().then((res) => {
-    console.log(res);
-  })
-  getUsersInfo().then((res) => {
-    console.log(res);
-  })
+
   res.setHeader("Content-Type", "application/json");
-  if (req.query.target === "person-list") {
-    res.end(JSON.stringify(personsList)); // см. personsList
-  } else {
-    res.end(JSON.stringify(housesList)); // см. housesList
-  }
+
+  /*getHouses().then((housesList) => {
+    getUsers().then((personsList) => {
+      res.end(JSON.stringify([personsList, housesList]))
+    })
+  })*/
+
+  res.end(JSON.stringify([[], []]));
 });
 
 // получение списка логинов, id клиентов
 app.get("/bounded", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
-  res.end(
-    JSON.stringify(
-      clients.map((item) => {
-        return {
-          login: item.login,
-          id: item.id,
-        };
-      })
-    )
-  );
+  getUsersInfo().then((clients) => {
+    res.end(JSON.stringify(clients))
+  })
 });
 
 // получение дополнительных данных для конкретного пользователя или жилья

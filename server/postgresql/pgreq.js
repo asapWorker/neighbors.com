@@ -1,6 +1,6 @@
 const db = require('../db')
 
-module.exports.getAddresses = async function() {
+module.exports.getHouses = async function() {
     const result = await db.query(`
         SELECT 
             ha.id,
@@ -13,15 +13,24 @@ module.exports.getAddresses = async function() {
         FROM 
             house_announcements ha
         JOIN 
-            addresses ad ON ad.id = ha.addressid
+            addresses ad ON ad.id = ha.addressId
         JOIN 
-            house_genders hg ON hg.id = ha.housegenderid
+            house_genders hg ON hg.id = ha.houseGenderId
         JOIN 
-            metros ON metros.id = ha.metroid
+            metros ON metros.id = ha.metroId
         JOIN 
-            house_ratings hr ON hr.id = ha.houseratingid
+            house_ratings hr ON hr.id = ha.houseRatingId
     `);
-    return result[0];
+
+    console.log(result);
+
+    return result[0].map((item) => {
+        return {
+            ...item,
+            money: Number(item.money),
+            sex: item.sex[0].toUpperCase() + item.sex.slice(1)
+        }
+    });
 };
 
 module.exports.getUsers = async function() {
@@ -40,10 +49,17 @@ module.exports.getUsers = async function() {
         JOIN 
             user_genders ug ON ug.id = ua.userGenderId
     `);
-    return result[0];
+
+    return result[0].map((item) => {
+        return {
+            ...item,
+            money: Number(item.money),
+            sex: item.sex[0].toUpperCase() + item.sex.slice(1)
+        }
+    });
 };
 
 module.exports.getUsersInfo = async function() {
-    const result = await db.query('SELECT id, login FROM users');
+    const result = await db.query("SELECT id, login FROM users WHERE role = 'user'");
     return (result[0]);
 };

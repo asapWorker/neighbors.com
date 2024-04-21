@@ -48,7 +48,7 @@ export const ItemText: FunctionComponent<ItemTextProps> = ({
 
       <div className={styles.str}>
         <Text type={TextType.Bold}>Метро: </Text>
-        <Text type={TextType.Normal}>{itemData.metro.join(', ')}</Text>
+        <Text type={TextType.Normal}>{itemData.metro}</Text>
       </div>
 
       <div className={styles.str}>
