@@ -36,7 +36,13 @@ const { personsList, housesList, clients } = require("./tempData");
 /* Функции для запросов к бд ---------------------------------*/
 
 // postgresql
-const { getHouses, getUsers, getUsersInfo} = require("./postgresql/pgreq.js");
+const { 
+  getHouses,
+  getUsers, 
+  getUsersInfo, 
+  getAdditionalInfoHouses, 
+  getAdditionalInfoUsers
+} = require("./postgresql/pgreq.js");
 
 // neo4j
 const {
@@ -56,6 +62,15 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
+  const itemId = 5;
+  getAdditionalInfoHouses(itemId).then((res) => {
+    console.log(res);
+  })
+
+  const userId = 3;
+  getAdditionalInfoUsers(userId).then((res) => {
+    console.log(res);
+  })
 
   res.setHeader("Content-Type", "application/json");
 
