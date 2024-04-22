@@ -41,7 +41,11 @@ const {
   getUsers, 
   getUsersInfo, 
   getAdditionalInfoHouses, 
-  getAdditionalInfoUsers
+  getAdditionalInfoUsers,
+  getHousesInfo, //запрос 11
+  getAllInfoUsers, //запрос 4
+  getAllInfoHouses, // запрос 4
+  getUserEnter //запрос 7
 } = require("./postgresql/pgreq.js");
 
 // neo4j
@@ -62,8 +66,22 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-
-  res.setHeader("Content-Type", "application/json");
+  const userid = 4
+  const houseid = 2
+  const log = 'user1@gmail.com'
+  const pass = '1234'
+  getHousesInfo().then((res) => {
+    console.log(res);
+  })
+  getAllInfoUsers(userid).then((res) => {
+    console.log(res);
+  })
+  getAllInfoHouses(houseid).then((res) => {
+    console.log(res);
+  })
+  getUserEnter(log, pass).then((res) => {
+    console.log(res);
+  })
 
   /*getHouses().then((housesList) => {
     getUsers().then((personsList) => {
