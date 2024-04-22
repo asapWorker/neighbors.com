@@ -62,15 +62,6 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-  const itemId = 5;
-  getAdditionalInfoHouses(itemId).then((res) => {
-    console.log(res);
-  })
-
-  const userId = 3;
-  getAdditionalInfoUsers(userId).then((res) => {
-    console.log(res);
-  })
 
   res.setHeader("Content-Type", "application/json");
 
@@ -103,34 +94,42 @@ app.get("/item", (req, res) => {
   let result = null;
 
   if (itemType === "person") {
-    result = {
-      // дополнитльные данные для person
-      mark: 5,
-      attitudeTowardSmoking: "Neutral",
-      boundedItems: [],
-      animals: true,
-    };
-  } else {
-    result = {
-      // дополнительные данные для house
-      mark: 5,
-      type: "Dorm",
-      smokingAllowed: false,
-      boundedItems: [],
-      animals: false,
-    };
-  }
+    getAdditionalInfoUsers(itemId).then((info) => {
+      result = {
+        ...info,
+        boundedItems: [],
+      };
 
-  getClientsNames(itemId)
-    .then((boundedItems) => {
-      result.boundedItems = boundedItems;
+      getClientsNames(itemId)
+      .then((boundedItems) => {
+        result.boundedItems = boundedItems;
+      })
+      .catch(() => {
+        result.boundedItems = [];
+      })
+      .finally(() => {
+        res.end(JSON.stringify(result));
+      });
     })
-    .catch(() => {
-      result.boundedItems = [];
+  } else {
+    getAdditionalInfoHouses(itemId).then((info) => {
+      result = {
+        ...info,
+        boundedItems: [],
+      }
+
+      getClientsNames(itemId)
+      .then((boundedItems) => {
+        result.boundedItems = boundedItems;
+      })
+      .catch(() => {
+        result.boundedItems = [];
+      })
+      .finally(() => {
+        res.end(JSON.stringify(result));
+      });
     })
-    .finally(() => {
-      res.end(JSON.stringify(result));
-    });
+  }
 });
 
 // получение данных объявления для страницы личного кабинета

@@ -90,7 +90,7 @@ module.exports.getAdditionalInfoHouses = async function(itemId) {
             WHERE
             house_announcements.id = :itemId
     `, { replacements: { itemId } });
-    return result[0]
+    return result[0][0]
 }
 
 module.exports.getAdditionalInfoUsers = async function(userId) {
@@ -110,5 +110,5 @@ module.exports.getAdditionalInfoUsers = async function(userId) {
         WHERE
             user_announcements.id = :userId
     `, { replacements: { userId } });
-    return result[0]
+    return result[0][0]
 }
