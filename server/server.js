@@ -48,7 +48,8 @@ const {
   getUserEnter, //запрос 7
   deleteUserAnnouncement, //запрос 5
   deleteHouseAnnouncement, //запрос 5
-  getMetroList //запрос 12
+  getMetroList, //запрос 12
+  updateRatings //запрос 10
 } = require("./postgresql/pgreq.js");
 
 // neo4j
@@ -95,6 +96,10 @@ app.get("/", (req, res) => {
   })
   */
   getMetroList().then((res) => {
+    console.log(res);
+  })
+
+  updateRatings(true, 9, 4, 7).then((res) => {
     console.log(res);
   })
 

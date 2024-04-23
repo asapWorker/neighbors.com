@@ -240,3 +240,17 @@ module.exports.getMetroList = async function() {
     const result = await db.query("SELECT id, name FROM metros");
     return (result[0]);
 };
+
+module.exports.updateRatings = async function(isHouse, itemId, rating, count) {
+    let announcementTableName = isHouse ? 'house_announcements' : 'user_announcements';
+    let ratingIdColumnName = isHouse ? 'houseratingid' : 'userratingid';
+    let typeRating = isHouse ? 'house_ratings' : 'user_ratings';
+    const result = await db.query(`
+        UPDATE ${typeRating}
+        SET average_rating = :rating,
+            count = :count
+        FROM ${announcementTableName}
+        WHERE ${announcementTableName}.id = :itemId AND ${announcementTableName}.${ratingIdColumnName} = ${typeRating}.id
+    `, { replacements: { rating, itemId, count } });
+    return result[0];
+};
