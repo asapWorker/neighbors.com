@@ -45,7 +45,10 @@ const {
   getHousesInfo, //запрос 11
   getAllInfoUsers, //запрос 4
   getAllInfoHouses, // запрос 4
-  getUserEnter //запрос 7
+  getUserEnter, //запрос 7
+  deleteUserAnnouncement, //запрос 5
+  deleteHouseAnnouncement, //запрос 5
+  getMetroList //запрос 12
 } = require("./postgresql/pgreq.js");
 
 // neo4j
@@ -70,6 +73,8 @@ app.get("/", (req, res) => {
   const houseid = 2
   const log = 'user1@gmail.com'
   const pass = '1234'
+  const announcementId = 7
+  /*
   getHousesInfo().then((res) => {
     console.log(res);
   })
@@ -80,6 +85,16 @@ app.get("/", (req, res) => {
     console.log(res);
   })
   getUserEnter(log, pass).then((res) => {
+    console.log(res);
+  })
+  deleteUserAnnouncement(announcementId).then((res) => {
+    console.log(res);
+  })
+  deleteHouseAnnouncement(announcementId).then((res) => {
+    console.log(res);
+  })
+  */
+  getMetroList().then((res) => {
     console.log(res);
   })
 

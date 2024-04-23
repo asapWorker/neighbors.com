@@ -215,3 +215,28 @@ module.exports.getUserEnter = async function(login, password) {
     
     return result[0][0];
 };
+
+module.exports.deleteUserAnnouncement = async function(announcementId) {
+    const result = await db.query(`
+        DELETE FROM user_announcements
+        WHERE user_announcements.id = :announcementId
+    `, { replacements: { announcementId } });
+};
+
+module.exports.deleteHouseAnnouncement = async function(announcementId) {
+    const result = await db.query(`
+        DELETE FROM addresses
+        WHERE addresses.id = (
+            SELECT addressid
+            FROM house_announcements
+            WHERE house_announcements.id = :announcementId
+        );
+        DELETE FROM house_announcements
+        WHERE house_announcements.id = :announcementId
+    `, { replacements: { announcementId } });
+};
+
+module.exports.getMetroList = async function() {
+    const result = await db.query("SELECT id, name FROM metros");
+    return (result[0]);
+};
