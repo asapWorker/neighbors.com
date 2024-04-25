@@ -49,7 +49,10 @@ const {
   deleteUserAnnouncement, //запрос 5
   deleteHouseAnnouncement, //запрос 5
   getMetroList, //запрос 12
-  updateRatings //запрос 10
+  updateRatings, //запрос 10
+  updateFields, //запрос 6
+  addAnnouncement, // запрос 9 
+  registerUser //запрос 8
 } = require("./postgresql/pgreq.js");
 
 // neo4j
@@ -70,7 +73,20 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-
+  /*
+  updateFields(false,2, 'first_name', 'Анастасия').then((res) => {
+    console.log(res);
+})*/
+/*
+data = {payment: 15000, addressid: 3, houseratingid: 3, userid: 3, housetypeid: 1, housegenderid: 1, smokingid: 2, animalid: 2, metroid: 8}
+addAnnouncement(true, data).then((res) => {
+  console.log(res);
+})
+const log = 'user10@mail.ru'
+const pass = '101010'
+registerUser(log, pass).then((res) => {
+  console.log(res);
+})*/
   /*getHouses().then((housesList) => {
     getUsers().then((personsList) => {
       res.end(JSON.stringify([personsList, housesList]))

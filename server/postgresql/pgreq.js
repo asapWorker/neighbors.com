@@ -254,3 +254,38 @@ module.exports.updateRatings = async function(isHouse, itemId, rating, count) {
     `, { replacements: { rating, itemId, count } });
     return result[0];
 };
+
+module.exports.updateFields = async function(isHouse, itemId, field, value) {
+    let announcementTableName = isHouse ? 'house_announcements' : 'user_announcements';
+    const result = await db.query(`
+        UPDATE ${announcementTableName}
+        SET ${field} = :value
+        WHERE ${announcementTableName}.id = :itemId
+    `, { replacements: { itemId, value } });
+    return result[0];
+};
+
+module.exports.addAnnouncement = async function(isHouse, data) {
+    let announcementTableName = isHouse ? 'house_announcements' : 'user_announcements';
+    const columns = Object.keys(data).join(', ');
+    const values = Object.values(data); 
+    const placeholders = Array(values.length).fill('?').join(', ');
+
+    const query = `
+        INSERT INTO ${announcementTableName} (${columns})
+        VALUES (${placeholders})
+    `;
+
+    const result = await db.query(query, { replacements: values });
+    return result[0];
+};
+
+module.exports.registerUser = async function(login, password) {
+    const query = `
+        INSERT INTO users (login, password, role)
+        VALUES (?, ?, 'user')
+        RETURNING id;
+    `;
+    const result = await db.query(query, { replacements: [login, password] });
+    return result[0][0].id;
+};
