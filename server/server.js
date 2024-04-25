@@ -71,13 +71,13 @@ const {
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
 
-  getHouses().then((housesList) => {
+  /*getHouses().then((housesList) => {
     getUsers().then((personsList) => {
       res.end(JSON.stringify([personsList, housesList]))
     })
-  })
+  })*/
 
-  //res.end(JSON.stringify([[], []]));
+  res.end(JSON.stringify([[], []]));
 });
 
 // получение дополнительных данных для конкретного пользователя или жилья
