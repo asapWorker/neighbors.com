@@ -7,13 +7,15 @@ import { useEditableTextData } from "./hooks/useEditableTextData";
 import { Btn } from "../Btn/Btn";
 import { Stars } from "../Stars/Stars";
 import { BoundedItem } from "../../modules/ItemModule/types/BoundedItem";
+import { Address } from "../../types/AddressType";
+import { MetroType } from "../../types/MetroType";
 
 interface EditableTextProps {
   children: React.ReactNode;
   isEditable: boolean;
   saveChanges: (value: any) => boolean | null;
   isWithRating?: boolean;
-  options?: BoundedItem[] | string[];
+  options?: BoundedItem[] | string[] | Address[] |MetroType[];
   isMultiple?: boolean;
   isNumber?: boolean;
   areMark?: boolean;
@@ -102,12 +104,12 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
               className={styles.select}
               onChange={textChangeHandle.bind(this)}
             >
-              {options.map((item: BoundedItem | string, num: number) => (
+              {options.map((item: BoundedItem | string | Address | MetroType, num: number) => (
                 <option
                   value={num}
                   key={typeof item === "string" ? item : item.id}
                 >
-                  {typeof item === "string" ? item : item.login}
+                  {typeof item === "string" ? item : item.name}
                 </option>
               ))}
             </select>

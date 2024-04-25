@@ -1,0 +1,16 @@
+.input-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2vmax;
+}
+
+.select {
+  width: 100%;
+  padding: 0 1vmin;
+  border: 1px solid #666666;
+
+  font-size: min(2.5vh, 5vw);
+  font-family: sans-serif;
+}

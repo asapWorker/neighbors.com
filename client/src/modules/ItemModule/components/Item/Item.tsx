@@ -5,7 +5,6 @@ import { EditableText } from "../../../../UI/EditableText/EditableText";
 import { useItemData } from "../../hooks/useItemData";
 import { Stars } from "../../../../UI/Stars/Stars";
 import {
-  Metros,
   YesNo,
   YesNoAnswers,
   attitudesTowardSmoking,
@@ -51,6 +50,8 @@ export const Item: FunctionComponent<ItemProps> = ({
     chooseHandle,
     deleteHandle,
     boundedItemsList,
+    addresses,
+    metros,
     isHouseBtnIsVisible,
     isPersonBtnIsVisible,
   } = useItemData(user, type, baseData, isPersonal, reportDeletion);
@@ -145,6 +146,7 @@ export const Item: FunctionComponent<ItemProps> = ({
           {("address" in itemData) && <EditableText
             isEditable={isEditable}
             saveChanges={setNewData.bind(this, "address")}
+            options={addresses}
           >
             <Text type={TextType.Bold}>Адрес:</Text>
             {itemData.address}
@@ -153,7 +155,7 @@ export const Item: FunctionComponent<ItemProps> = ({
           {("metro" in itemData) && <EditableText
             isEditable={isEditable}
             saveChanges={setNewData.bind(this, "metro")}
-            options={Metros}
+            options={metros}
           >
             <Text type={TextType.Bold}>Метро:</Text>
             {itemData.metro}

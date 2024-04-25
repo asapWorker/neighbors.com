@@ -14,6 +14,7 @@ import {
   sexes,
 } from "../../../../constants/constants";
 import { TextField, TextFieldType } from "../../../../UI/TextField/TextField";
+import { SelectField } from "../../../../UI/SelectField/SelectField";
 
 export const enum FormType {
   Enter = "enter",
@@ -38,6 +39,8 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
     signUp,
     isHouse,
     targetChangeHandle,
+    addresses,
+    metros
   } = useFormData(type === FormType.NewAnnouncement, reportAboutSubmit);
 
   if (type === FormType.Enter) {
@@ -53,7 +56,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
         <div className={styles.container}>
           <h3 className={styles.title}>Вход</h3>
 
-          <TextField name="login" isMessage={!isFilled}>
+          <TextField name="login" isMessage={!isFilled} form="form">
             <Text type={TextType.Bold}>Логин:</Text>
           </TextField>
 
@@ -61,6 +64,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
             name="password"
             isMessage={!isFilled}
             type={TextFieldType.Password}
+            form="form"
           >
             <Text type={TextType.Bold}>Пароль:</Text>
           </TextField>
@@ -83,7 +87,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
   } else {
     return (
       <form
-        id="form"
+        id={isHouse ? "house" : "person"}
         ref={formRef}
         className={classnames(
           styles.form,
@@ -96,7 +100,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
           </h3>
 
           {(type === FormType.Registration) && <>
-            <TextField name="login" isMessage={!isFilled}>
+            <TextField name="login" isMessage={!isFilled} form={isHouse ? "house" : "person"}>
               <Text type={TextType.Bold}>Логин:</Text>
             </TextField>
 
@@ -104,6 +108,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
               name="password"
               isMessage={!isFilled}
               type={TextFieldType.Password}
+              form={isHouse ? "house" : "person"}
             >
               <Text type={TextType.Bold}>Пароль:</Text>
             </TextField>
@@ -112,70 +117,75 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
           <div className={styles.target}>
             <Text type={TextType.Bold}>Ищу:</Text>
             <div className={styles["target-options"]}>
-              <label htmlFor="target-house" className={styles.label}>
-                <input
-                  className={styles.input}
-                  type="radio"
-                  name="target"
-                  value="target-house"
-                  id="target-house"
-                  form="form"
-                  onChange={targetChangeHandle.bind(this)}
-                  defaultChecked={true}
-                />
-                жилье
-              </label>
-
               <label htmlFor="target-person" className={styles.label}>
                 <input
                   className={styles.input}
                   type="radio"
                   name="target"
-                  value="target-person"
+                  value="house"
                   id="target-person"
-                  form="form"
+                  form={isHouse ? "house" : "person"}
                   onChange={targetChangeHandle.bind(this)}
+                  defaultChecked={true}
                 />
                 соседа
+              </label>
+
+              <label htmlFor="target-house" className={styles.label}>
+                <input
+                  className={styles.input}
+                  type="radio"
+                  name="target"
+                  value="person"
+                  id="target-house"
+                  form={isHouse ? "house" : "person"}
+                  onChange={targetChangeHandle.bind(this)}
+                />
+                жилье
               </label>
             </div>
           </div>
 
           {!isHouse && (
             <>
-              <TextField name="address" isMessage={!isFilled}>
+              <SelectField options={addresses} name="address" form="person">
                 <Text type={TextType.Bold}>Адресс:</Text>
-              </TextField>
+              </SelectField>
 
-              <TextField name="metro" isMessage={!isFilled}>
+              <SelectField name="metro" options={metros} form="person">
                 <Text type={TextType.Bold}>Метро:</Text>
-              </TextField>
+              </SelectField>
 
               <TextField
                 name="money"
                 isMessage={!isFilled}
                 type={TextFieldType.Number}
+                form="person"
               >
                 <Text type={TextType.Bold}>Плата:</Text>
               </TextField>
 
-              <RadioField radios={sexes} name="sex">
+              <RadioField radios={sexes} name="sex" form="person">
                 <Text type={TextType.Bold}>Пол:</Text>
               </RadioField>
 
-              <RadioField radios={houseTypes} name="house-type">
+              <RadioField radios={houseTypes} name="type" form="person">
                 <Text type={TextType.Bold}>Тип:</Text>
               </RadioField>
 
-              <RadioField radios={YesNoAnswers} name="allowed-smoking">
+              <RadioField radios={YesNoAnswers} name="smoking" form="person">
                 <Text type={TextType.Bold}>Разрешено курение:</Text>
+              </RadioField>
+
+              <RadioField radios={YesNoAnswers} name="animals" form="person">
+                <Text type={TextType.Bold}>Разрешены животные:</Text>
               </RadioField>
             </>
           )}
 
           {isHouse && (
             <>
-              <TextField name="name" isMessage={!isFilled}>
+              <TextField name="name" isMessage={!isFilled} form="house">
                 <Text type={TextType.Bold}>Имя:</Text>
               </TextField>
 
@@ -183,11 +193,12 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
                 name="age"
                 isMessage={!isFilled}
                 type={TextFieldType.Number}
+                form="house"
               >
                 <Text type={TextType.Bold}>Возраст:</Text>
               </TextField>
 
-              <RadioField radios={personSexes} name="sex">
+              <RadioField radios={personSexes} name="sex" form="house">
                 <Text type={TextType.Bold}>Пол:</Text>
               </RadioField>
 
@@ -195,15 +206,21 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
                 name="money"
                 isMessage={!isFilled}
                 type={TextFieldType.Number}
+                form="house"
               >
                 <Text type={TextType.Bold}>Бюджет:</Text>
               </TextField>
 
               <RadioField
                 radios={attitudesTowardSmoking}
-                name="attitude-toward-smoking"
+                name="smoking"
+                form="house"
               >
                 <Text type={TextType.Bold}>Отношение к курению:</Text>
+              </RadioField>
+
+              <RadioField radios={YesNoAnswers} name="animals" form="house">
+                <Text type={TextType.Bold}>Есть животные:</Text>
               </RadioField>
             </>
           )}

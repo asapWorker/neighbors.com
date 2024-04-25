@@ -20,12 +20,14 @@ interface TextFieldProps {
   type?: TextFieldType; 
   isMessage: boolean;
   name: string;
+  form: string;
 }
 
 export const TextField: FunctionComponent<TextFieldProps> = ({
   children,
   name,
   isMessage,
+  form,
   type = TextFieldType.Text
 }) => {
   const { value, changeHandle } = useTextFieldData();
@@ -35,7 +37,7 @@ export const TextField: FunctionComponent<TextFieldProps> = ({
       {children}
 
       <input
-        form="form"
+        form={form}
         className={styles.input}
         type={type}
         onChange={changeHandle.bind(this)}

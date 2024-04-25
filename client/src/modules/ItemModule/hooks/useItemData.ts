@@ -17,6 +17,10 @@ import { changeFieldData } from "../api/changeFieldData";
 import { deleteItemInfo } from "../api/deleteItem";
 import { BoundedItem } from "../types/BoundedItem";
 import { chooseItem } from "../api/chooseItem";
+import { getAddresses } from "../../../api/getAddresses";
+import { Address } from "../../../types/AddressType";
+import { getMetros } from "../../../api/getMetros";
+import { MetroType } from "../../../types/MetroType";
 
 const REPLICATION = 3;
 
@@ -53,6 +57,9 @@ export const useItemData = (
 
   const [isChanged, setIsChanged] = useState<boolean>(true);
   const [boundedItemsList, setBoundedItemsList] = useState<BoundedItem[]>([]);
+
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [metros, setMetros] = useState<MetroType[]>([]);
 
   useEffect(() => {
     if (isPersonal) {
@@ -117,10 +124,25 @@ export const useItemData = (
       .catch(() => {
         setBoundedItemsList([]);
       });
+
+    getAddresses().then((list) => {
+      setAddresses(list);
+    }).catch(() => {
+      setAddresses([]);
+    })
+
+    getMetros().then((list) => {
+      console.log(list);
+      setMetros(list);
+    }).catch(() => {
+      setMetros([]);
+    })
+
   }, [isChanged]);
 
   const setNewData = useCallback(
     (field: string, value: any) => {
+      console.log("hello", itemData)
       if (itemData) {
         changeFieldData(type, itemData, field, value).then((res) => {
           if (field === "bounded-items") {
@@ -181,6 +203,8 @@ export const useItemData = (
     chooseHandle,
     deleteHandle,
     boundedItemsList,
+    addresses,
+    metros,
     isHouseBtnIsVisible: isLookingForHouse && (type === "person" ? true : false),
     isPersonBtnIsVisible: isLookingForPerson && (type === "house" ? true : false)
   };

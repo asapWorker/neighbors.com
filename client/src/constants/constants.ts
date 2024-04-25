@@ -39,7 +39,7 @@ export const enum YesNo {
 }
 
 /* arrays */
-export const sexes = [Sex.Any, Sex.Male, Sex.Female];
+export const sexes = [Sex.Male, Sex.Female, Sex.Any];
 
 export const personSexes = [Sex.Male, Sex.Female];
 
@@ -52,9 +52,9 @@ export const houseTypes = [
 ];
 
 export const attitudesTowardSmoking = [
-  AttitudeTowardSmoking.Neutral,
-  AttitudeTowardSmoking.NoSmoking,
   AttitudeTowardSmoking.Smoking,
+  AttitudeTowardSmoking.NoSmoking,
+  AttitudeTowardSmoking.Neutral,
 ];
 
 export const YesNoAnswers = [

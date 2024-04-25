@@ -15,7 +15,7 @@ export async function changeFieldData(item: string, itemData: any, field: string
       },
     );
 
-    const res = response.json();
+    const res = await response.json();
     return res;
 
   } catch {

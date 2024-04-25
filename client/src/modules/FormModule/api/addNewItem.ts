@@ -1,4 +1,4 @@
-async function addNewItem(form: FormData) {
+export async function addNewItem(form: FormData) {
   try {
     const response = await fetch(
       `http://localhost:8080/new-item`,

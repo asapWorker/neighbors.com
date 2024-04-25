@@ -1,8 +1,43 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useChangeUser, useUser } from "../../../contexts/useUserContext";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { enter } from "../api/enter";
 import { registrate } from "../api/registrate";
+import { Address } from "../../../types/AddressType";
+import { getAddresses } from "../../../api/getAddresses";
+import { MetroType } from "../../../types/MetroType";
+import { getMetros } from "../../../api/getMetros";
+import { addNewItem } from "../api/addNewItem";
+
+
+function preprocessData(data: FormData, addresses: Address[], metros: MetroType[]) {
+  let isFilled = true;
+
+  data.forEach((val, name) => {
+    if (val === "") {
+      isFilled = false;
+    } else if ((name === "password") && (val.toString().length < 8)) {
+      isFilled = false;
+      return;
+    }
+  })
+
+  if (!isFilled) {
+    return isFilled;
+  }
+
+  data.forEach((val, name) => {
+    if (name === "address") {
+      data.set(name, addresses[Number(val)].id);
+    } else if (name === "metro") {
+      data.set(name, metros[Number(val)].id);
+    } else if (["sex", "type", "smoking", "animals"].includes(name)) {
+      data.set(name, String(Number(val) + 1));
+    }
+  })
+
+  return isFilled;
+}
 
 
 export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) => {
@@ -12,8 +47,24 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
   const formRef = useRef<HTMLFormElement>(null);
   const {changeUser} = useChangeUser();
   const [isFilled, setIsFilled] = useState<boolean>(true);
-  const [isHouse, setIsHouse] = useState<boolean>(true);
+  const [isHouse, setIsHouse] = useState<boolean>(false);
 
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [metros, setMetros] = useState<MetroType[]>([]);
+
+  useEffect(() => {
+    getAddresses().then((list) => {
+      setAddresses(list);
+    }).catch(() => {
+      setAddresses([]);
+    })
+
+    getMetros().then((list) => {
+      setMetros(list);
+    }).catch(() => {
+      setMetros([]);
+    })
+  }, [])
 
   const goToRegistration = useCallback(() => {
     navige("../registrate");
@@ -23,17 +74,7 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
   const submitChanges = useCallback((event: any) => {
     const data = new FormData(formRef.current);
 
-    let isFilled = true;
-
-    data.forEach((val, name) => {
-      if (val === "") {
-        isFilled = false;
-        return;
-      } else if ((name === "password") && (val.toString().length < 8)) {
-        isFilled = false;
-        return;
-      }
-    })
+    const isFilled = preprocessData(data, addresses, metros);
 
     if (isFilled) {
       enter(data).then((res) => {
@@ -56,37 +97,42 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
   const signUp = useCallback((event: any) => {
     const data = new FormData(formRef.current);
 
-    let isFilled = true;
-
-    data.forEach((val, name) => {
-      if (val === "") {
-        isFilled = false;
-        return;
-      } else if ((name === "password") && (val.toString().length < 8)) {
-        isFilled = false;
-        return;
-      }
-    })
+    const isFilled = preprocessData(data, addresses, metros);
 
     if (isFilled) {
-      data.set("id", user.id);
+      
+      if (isPersonal) {
 
-      registrate(data).then((res) => {
-        if (res) {
-          setIsFilled(true);
-
-          if (isPersonal) {
-            reportAboutSubmit();
+        addNewItem(data).then((res) => {
+          if (res) {
+            setIsFilled(false);
           } else {
-            navige("../enter");
+            setIsFilled(false);
           }
 
-        } else {
-          setIsFilled(false);
-        }
-      }).catch(() => {
-        console.log("Не удалось зарегистрироваться");
-      })
+          reportAboutSubmit();
+
+        }).catch(() => {
+          console.log("Не удалось добавить объявление");
+        })
+
+      } else {
+
+        registrate(data).then((res) => {
+          data.set("id", user.id);
+          
+          if (res) {
+            setIsFilled(true);
+            navige("../enter");
+  
+          } else {
+            setIsFilled(false);
+          }
+        }).catch(() => {
+          console.log("Не удалось зарегистрироваться");
+        })
+      }
+
     } else {
       setIsFilled(false);
     }
@@ -95,7 +141,7 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
   }, [user])
 
   const targetChangeHandle = useCallback((event: any) => {
-    if (event.target.value === "target-house") {
+    if (event.target.value === "person") {
       setIsHouse(true);
     } else {
       setIsHouse(false);
@@ -109,6 +155,8 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
     goToRegistration,
     signUp,
     isHouse,
-    targetChangeHandle
+    targetChangeHandle,
+    addresses,
+    metros
   }
 }

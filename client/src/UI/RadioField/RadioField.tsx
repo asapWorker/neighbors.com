@@ -7,12 +7,14 @@ interface RadioFieldProps {
   children: React.ReactNode;
   radios: string[];
   name: string;
+  form: string;
 }
 
 export const RadioField: FunctionComponent<RadioFieldProps> = ({
   children,
   radios,
-  name
+  name,
+  form
 }) => {
   return <div
     className={styles["input-field"]}
@@ -32,9 +34,9 @@ export const RadioField: FunctionComponent<RadioFieldProps> = ({
                   className={styles["radio-input"]}
                   type="radio"
                   name={name}
-                  value={val + num}
+                  value={num}
                   id={val}
-                  form="form"
+                  form={form}
                   defaultChecked={!num}
                 />
                 <label htmlFor={val}>{val}</label>

@@ -1,15 +1,16 @@
 import { useCallback, useState } from "react";
 import { BoundedItem } from "../../../modules/ItemModule/types/BoundedItem";
+import { Address } from "../../../types/AddressType";
 
 export const useEditableTextData = (
   defaultValue: string,
   saveChanges: (val: any) => boolean | null,
   isWithRating: boolean,
   areMark: boolean,
-  options: string[] | BoundedItem[]
+  options: string[] | BoundedItem[] | Address[]
 ) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [curValue, setCurValue] = useState<string | BoundedItem>(
+  const [curValue, setCurValue] = useState<string | BoundedItem | Address>(
     options ? options[0] : ""
   );
   const [value, setValue] = useState<string>(defaultValue);
@@ -70,15 +71,15 @@ export const useEditableTextData = (
           const newValue = new Set(value.split(", "));
 
           if (curRating < 0) {
-            if (newValue.has(curValue.login)) {
-              newValue.delete(curValue.login);
+            if (newValue.has(curValue.name)) {
+              newValue.delete(curValue.name);
             }
           } else {
-            newValue.add(curValue.login);
+            newValue.add(curValue.name);
           }
           setValue(Array.from(newValue).join(", "));
         } else {
-          setValue(curValue.login);
+          setValue(curValue.name);
         }
         saveChanges({
           item: curValue,
