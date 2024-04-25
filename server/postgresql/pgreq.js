@@ -152,7 +152,7 @@ module.exports.getAllInfoUsers = async function(userid) {
             money: Number(item.money),
             sex: item.sex[0].toUpperCase() + item.sex.slice(1)
         }
-    });
+    })[0];
 }
 
 module.exports.getAllInfoHouses = async function(itemid) {
@@ -187,7 +187,7 @@ module.exports.getAllInfoHouses = async function(itemid) {
             money: Number(item.money),
             sex: item.sex[0].toUpperCase() + item.sex.slice(1)
         }
-    });
+    })[0];
 }
 
 module.exports.getUserEnter = async function(login, password) {
@@ -214,4 +214,43 @@ module.exports.getUserEnter = async function(login, password) {
     `, { replacements: { login, password } });
     
     return result[0][0];
+};
+
+module.exports.deleteUserAnnouncement = async function(announcementId) {
+    const result = await db.query(`
+        DELETE FROM user_announcements
+        WHERE user_announcements.id = :announcementId
+    `, { replacements: { announcementId } });
+};
+
+module.exports.deleteHouseAnnouncement = async function(announcementId) {
+    const result = await db.query(`
+        DELETE FROM addresses
+        WHERE addresses.id = (
+            SELECT addressid
+            FROM house_announcements
+            WHERE house_announcements.id = :announcementId
+        );
+        DELETE FROM house_announcements
+        WHERE house_announcements.id = :announcementId
+    `, { replacements: { announcementId } });
+};
+
+module.exports.getMetroList = async function() {
+    const result = await db.query("SELECT id, name FROM metros");
+    return (result[0]);
+};
+
+module.exports.updateRatings = async function(isHouse, itemId, rating, count) {
+    let announcementTableName = isHouse ? 'house_announcements' : 'user_announcements';
+    let ratingIdColumnName = isHouse ? 'houseratingid' : 'userratingid';
+    let typeRating = isHouse ? 'house_ratings' : 'user_ratings';
+    const result = await db.query(`
+        UPDATE ${typeRating}
+        SET average_rating = :rating,
+            count = :count
+        FROM ${announcementTableName}
+        WHERE ${announcementTableName}.id = :itemId AND ${announcementTableName}.${ratingIdColumnName} = ${typeRating}.id
+    `, { replacements: { rating, itemId, count } });
+    return result[0];
 };

@@ -45,7 +45,11 @@ const {
   getHousesInfo, //запрос 11
   getAllInfoUsers, //запрос 4
   getAllInfoHouses, // запрос 4
-  getUserEnter //запрос 7
+  getUserEnter, //запрос 7
+  deleteUserAnnouncement, //запрос 5
+  deleteHouseAnnouncement, //запрос 5
+  getMetroList, //запрос 12
+  updateRatings //запрос 10
 } = require("./postgresql/pgreq.js");
 
 // neo4j
@@ -66,39 +70,14 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-  const userid = 4
-  const houseid = 2
-  const log = 'user1@gmail.com'
-  const pass = '1234'
-  getHousesInfo().then((res) => {
-    console.log(res);
-  })
-  getAllInfoUsers(userid).then((res) => {
-    console.log(res);
-  })
-  getAllInfoHouses(houseid).then((res) => {
-    console.log(res);
-  })
-  getUserEnter(log, pass).then((res) => {
-    console.log(res);
-  })
 
-  /*getHouses().then((housesList) => {
+  getHouses().then((housesList) => {
     getUsers().then((personsList) => {
       res.end(JSON.stringify([personsList, housesList]))
     })
-  })*/
-
-  res.end(JSON.stringify([[], []]));
-});
-
-// получение списка логинов, id клиентов
-app.get("/bounded", (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-
-  getUsersInfo().then((clients) => {
-    res.end(JSON.stringify(clients))
   })
+
+  //res.end(JSON.stringify([[], []]));
 });
 
 // получение дополнительных данных для конкретного пользователя или жилья
@@ -158,20 +137,18 @@ app.get("/person/item", (req, res) => {
     if (!itemData) {
       res.end(JSON.stringify(null));
     } else {
-      // временный код
-      let answer = {
-        // объявление для жилья в личном кабинете
-        announcement: "house",
-        type: "Dorm",
-        id: "6",
-        address: "Профсоюзная 104а",
-        sex: "Female",
-        metro: ["Коньково", "Беляево", "Комсомольская"],
-        money: 2200,
-        animals: true,
-      };
+      const type = itemData.type;
+      const id = itemData.id;
 
-      res.end(JSON.stringify(answer));
+      if (type === "house") {
+        getAllInfoHouses(id).then((h) => {
+          res.end(JSON.stringify(h));
+        })
+      } else {
+        getAllInfoUsers(id).then((u) => {
+          res.end(JSON.stringify(u));
+        })
+      }
     }
   });
 
@@ -188,6 +165,15 @@ app.get("/person/item", (req, res) => {
   */
 });
 
+// получение списка логинов, id клиентов
+app.get("/bounded", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+
+  getUsersInfo().then((clients) => {
+    res.end(JSON.stringify(clients))
+  })
+});
+
 // получение списка оценок жилья и людей конкретного пользователя
 app.get("/marks", upload.any(), (req, res) => {
   const clientId = req.query.id;
@@ -197,15 +183,44 @@ app.get("/marks", upload.any(), (req, res) => {
   });
 });
 
+// получение списка адресов
+app.get("/addresses", (req, res) => {
+  getHousesInfo().then((addresses) => {
+    res.end(JSON.stringify(addresses));
+  })
+})
+
+app.get("/metros", (req, res) => {
+  getMetroList().then((metros) => {
+    res.end(JSON.stringify(metros));
+  })
+})
+
 /* POST запросы */
+// обработка добавления нового объявления
+app.post("/new-item", upload.any(), (req, res) => {
+  const announcement = req.body;
+  console.log(announcement);
+  res.end();
+});
+
 // удаление объявления
 app.post("/item/delete", (req, res) => {
   const itemType = req.query.item; // house | person
   const itemId = req.query.id;
 
   deleteNode(itemId).then(() => {
-    res.end();
+    if (itemType === "house") {
+      deleteHouseAnnouncement().then(() => {
+        res.end();
+      })
+    } else {
+      deleteUserAnnouncement().then(() => {
+        res.end();
+      })
+    }
   });
+
 });
 
 // выбор объявления
@@ -215,26 +230,29 @@ app.post("/item/choose", upload.any(), (req, res) => {
   const userData = req.body.user;
   const itemData = req.body.itemData;
 
-  // временный код
-  const userName = new Map(clients.map((c) => [c.id, c.login])).get(
-    userData.id
-  );
+  getUsersInfo().then((list) => {
 
-  const clientObj = {
-    id: userData.id,
-    name: userName,
-    type: "client",
-  };
+    const userName = new Map(list.map(({id, login}) => {
+      return [id, login];
+    })).get(userData.id);
 
-  const itemObj = {
-    id: itemData.id,
-    name: itemType === "house" ? itemData.address : itemData.name,
-    type: itemType,
-  };
+    const clientObj = {
+      id: userData.id,
+      name: userName,
+      type: "client",
+    };
+  
+    const itemObj = {
+      id: itemData.id,
+      name: itemType === "house" ? itemData.address : itemData.name,
+      type: itemType,
+    };
+  
+    addOrUpdateConnection(clientObj, itemObj, "relation", 0, true).then(() => {
+      res.end();
+    });
 
-  addOrUpdateConnection(clientObj, itemObj, "relation", 0, true).then(() => {
-    res.end();
-  });
+  })
 });
 
 // изменение поля
@@ -245,6 +263,8 @@ app.post("/item/change", upload.any(), (req, res) => {
   // Дом: address | metro | sex | money | type | smoking | animals | bounded-items
   // Человек: name | age | sex | money | attitude-toward-smoking | animals | bounded-items
   const value = req.body.value;
+
+  console.log(itemType, field, itemData);
 
   if (field === "bounded-items") {
     const clientObj = {
@@ -260,58 +280,11 @@ app.post("/item/change", upload.any(), (req, res) => {
       type: itemType,
     };
 
-    addOrUpdateConnection(clientObj, itemObj, "relation", rating).then(
-      () => {
-        getMarks(itemObj.id).then((marks) => {
-
-          const num = marks.length;
-          const average = (!num) ? 0 : marks.reduce((accum, cur) => {
-            return accum +cur;
-          }) / num
-
-          res.end(JSON.stringify(average));
-        })
-      }
-    );
+    res.end(JSON.stringify(true));
+    
   } else {
     res.end(JSON.stringify(null));
   }
-});
-
-// Обработка входа
-app.post("/enter", upload.any(), (req, res) => {
-  const login = req.body.login;
-  const password = req.body.password;
-
-  if (login === "admin") {
-    res.end(
-      JSON.stringify({
-        id: "111",
-        type: "Admin",
-      })
-    );
-  } else if (login === "client") {
-    res.end(
-      JSON.stringify({
-        id: "222",
-        type: "Client",
-        house: true,
-        person: false,
-      })
-    );
-  } else {
-    return res.end(null);
-  }
-});
-
-// обработка регистрации
-app.post("/registrate", upload.any(), (req, res) => {
-  res.end();
-});
-
-// обработка добавления нового объявления
-app.post("/new-item", upload.any(), (req, res) => {
-  res.end();
 });
 
 // изменение оценки жилья или человека конкретным пользователем
@@ -323,4 +296,40 @@ app.post("/change/mark", upload.any(), (req, res) => {
   updateRating(clientId, itemId, mark).finally(() => {
     res.end();
   });
+});
+
+// Обработка входа
+app.post("/enter", upload.any(), (req, res) => {
+  const login = req.body.login;
+  const password = req.body.password;
+
+  getUserEnter(login, password).then((r) => {
+    
+    if (!r) {
+      res.end(JSON.stringify(r));
+      return;
+    }
+
+    r.house = false;
+    r.person = false;
+
+    getActiveItem(r.id).then((val) => {
+      if (!val) return;
+
+      if (val.type === "house") {
+        r.house = true;
+      } else if (val.type === "person") {
+        r.person = true;
+      }
+    })
+
+    res.end(JSON.stringify(r));
+  })
+});
+
+// обработка регистрации
+app.post("/registrate", upload.any(), (req, res) => {
+  const obj = req.body;
+  console.log(obj);
+  res.end();
 });
