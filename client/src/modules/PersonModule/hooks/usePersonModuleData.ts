@@ -17,12 +17,16 @@ export const usePersonModuleData = () => {
   const [isForm, setIsForm] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log("PERSONAL");
     if (!isForm) {
+      console.log(isForm);
       getPersonalItemData(user.id)
         .then((res) => {
+          console.log(res)
           setBaseData(res);
         })
         .catch(() => {
+          console.log(null);
           setBaseData(null);
         });
     }

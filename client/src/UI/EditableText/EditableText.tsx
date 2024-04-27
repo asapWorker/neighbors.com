@@ -89,12 +89,10 @@ export const EditableText: FunctionComponent<EditableTextProps> = ({
 
           {isWithRating && (
             <input
-              type="number"
-              min={areMark ? 0 : -1}
-              max={5}
               onChange={ratingChangeHandle.bind(this)}
               className={styles["text-input"]}
               value={curRating}
+              type="number"
             />
           )}
 

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "homepage": "/guest",
+  "homepage": "/",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "webpack --mode production"

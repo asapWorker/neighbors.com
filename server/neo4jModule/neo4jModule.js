@@ -11,7 +11,7 @@ const password = 'default';
 module.exports.addOrUpdateConnection = async (obj1, obj2, connectionType, rating, makeActive = false) => {
   const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
   const session = driver.session();
-
+3
   try {
       const result1 = await session.run(
           'MERGE (client:' + obj1.type + ' {id: $id1, name: $name}) RETURN client',
@@ -196,7 +196,7 @@ module.exports.getActiveItem = async (clientId) => {
     const result = await session.run(
       `MATCH (client:client {id: $clientId})-[r:relation]->(item)
       WHERE (item:house OR item:person) AND r.isActive = true
-      RETURN {id: ID(item), type: labels(item)[0]} as activeItem`,
+      RETURN {id: item.id, type: labels(item)[0]} as activeItem`,
       { clientId })
 
     if (result.records.length === 0) {

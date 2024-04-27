@@ -28,11 +28,14 @@ function preprocessData(data: FormData, addresses: Address[], metros: MetroType[
 
   data.forEach((val, name) => {
     if (name === "address") {
+      data.set("item", addresses[Number(val)].name);
       data.set(name, addresses[Number(val)].id);
     } else if (name === "metro") {
       data.set(name, metros[Number(val)].id);
     } else if (["sex", "type", "smoking", "animals"].includes(name)) {
       data.set(name, String(Number(val) + 1));
+    } else if (name === "name") {
+      data.set("item", val);
     }
   })
 
@@ -102,6 +105,8 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
     if (isFilled) {
       
       if (isPersonal) {
+        data.set("id", user.id);
+        data.set("usertype", user.type);
 
         addNewItem(data).then((res) => {
           if (res) {
@@ -119,7 +124,6 @@ export const useFormData = (isPersonal: boolean, reportAboutSubmit: () => void) 
       } else {
 
         registrate(data).then((res) => {
-          data.set("id", user.id);
           
           if (res) {
             setIsFilled(true);

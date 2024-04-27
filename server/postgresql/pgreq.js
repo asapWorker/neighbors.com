@@ -22,8 +22,6 @@ module.exports.getHouses = async function() {
             house_ratings hr ON hr.id = ha.houseRatingId
     `);
 
-    console.log(result);
-
     return result[0].map((item) => {
         return {
             ...item,
@@ -63,6 +61,30 @@ module.exports.getUsersInfo = async function() {
     const result = await db.query("SELECT id, login FROM users WHERE role = 'user'");
     return (result[0]);
 };
+
+module.exports.getUserLogin = async function(id) {
+    const result = await db.query(`SELECT login FROM users WHERE id = '${id}'`);
+    return (result[0][0].login);
+}
+
+module.exports.getItemId = async function(isHouse, announcement) {
+    let result = 0;
+    let params = [];
+
+    for ([key,value] of Object.entries(announcement)) {
+        params.push(`${key} = ${value}`);
+    }
+
+    params = params.join(" AND ");
+
+    if (isHouse) {
+        result = await db.query(`SELECT id FROM house_announcements WHERE ${params}`)
+    } else {
+        result = await db.query(`SELECT id FROM user_announcements WHERE ${params}`)
+    }
+
+    return result[0][0].id;
+}
 
 
 module.exports.getAdditionalInfoHouses = async function(itemId) {
@@ -225,15 +247,9 @@ module.exports.deleteUserAnnouncement = async function(announcementId) {
 
 module.exports.deleteHouseAnnouncement = async function(announcementId) {
     const result = await db.query(`
-        DELETE FROM addresses
-        WHERE addresses.id = (
-            SELECT addressid
-            FROM house_announcements
-            WHERE house_announcements.id = :announcementId
-        );
         DELETE FROM house_announcements
         WHERE house_announcements.id = :announcementId
-    `, { replacements: { announcementId } });
+    `, { replacements: { announcementId }});
 };
 
 module.exports.getMetroList = async function() {
@@ -245,14 +261,46 @@ module.exports.updateRatings = async function(isHouse, itemId, rating, count) {
     let announcementTableName = isHouse ? 'house_announcements' : 'user_announcements';
     let ratingIdColumnName = isHouse ? 'houseratingid' : 'userratingid';
     let typeRating = isHouse ? 'house_ratings' : 'user_ratings';
-    const result = await db.query(`
-        UPDATE ${typeRating}
-        SET average_rating = :rating,
-            count = :count
-        FROM ${announcementTableName}
-        WHERE ${announcementTableName}.id = :itemId AND ${announcementTableName}.${ratingIdColumnName} = ${typeRating}.id
-    `, { replacements: { rating, itemId, count } });
-    return result[0];
+
+    const curRatingIdQuery = await db.query(`
+        SELECT ${ratingIdColumnName} FROM ${announcementTableName}
+    `)
+
+    const curRatingId = curRatingIdQuery[0][0][`${ratingIdColumnName}`];
+
+    if (curRatingId === "0" && rating === 0 && count === 0) {
+        return true;
+    } else if (curRatingId !== "0") {
+        const deleteRatingRequest = await db.query(`
+            DELETE FROM ${typeRating} WHERE ${typeRating}.id = ${curRatingId}
+        `);
+    }
+
+    if (rating === 0 && count === 0) {
+        const result = await db.query(`
+            UPDATE ${announcementTableName}
+            SET ${ratingIdColumnName} = ${0}
+            WHERE ${announcementTableName}.id = '${itemId}'
+        `);
+
+        return result[0];
+    } else {
+        const ratingResult = await db.query(`
+            INSERT INTO ${typeRating} (average_rating, count)
+            VALUES (${rating}, ${count})
+            RETURNING id`
+        );
+
+        const ratingId = ratingResult[0][0].id;
+        
+        const result = await db.query(`
+            UPDATE ${announcementTableName}
+            SET ${ratingIdColumnName} = ${ratingId}
+            WHERE ${announcementTableName}.id = ${itemId}
+        `);
+
+        return result[0];
+    }
 };
 
 module.exports.updateFields = async function(isHouse, itemId, field, value) {
@@ -267,6 +315,7 @@ module.exports.updateFields = async function(isHouse, itemId, field, value) {
 
 module.exports.addAnnouncement = async function(isHouse, data) {
     let announcementTableName = isHouse ? 'house_announcements' : 'user_announcements';
+
     const columns = Object.keys(data).join(', ');
     const values = Object.values(data); 
     const placeholders = Array(values.length).fill('?').join(', ');
@@ -277,6 +326,7 @@ module.exports.addAnnouncement = async function(isHouse, data) {
     `;
 
     const result = await db.query(query, { replacements: values });
+
     return result[0];
 };
 

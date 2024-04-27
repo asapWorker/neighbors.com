@@ -10,6 +10,7 @@ export const useMarksData = (id: string) => {
     if (!id || id == "") return;
     
     getMarks(id).then((data) => {
+      console.log(data);
       setDefaultMarksList(data);
     }).catch(() => {
       console.log("Оценки не получены");

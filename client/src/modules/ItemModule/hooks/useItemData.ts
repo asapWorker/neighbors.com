@@ -132,7 +132,6 @@ export const useItemData = (
     })
 
     getMetros().then((list) => {
-      console.log(list);
       setMetros(list);
     }).catch(() => {
       setMetros([]);
@@ -142,20 +141,9 @@ export const useItemData = (
 
   const setNewData = useCallback(
     (field: string, value: any) => {
-      console.log("hello", itemData)
       if (itemData) {
-        changeFieldData(type, itemData, field, value).then((res) => {
-          if (field === "bounded-items") {
 
-            setItemData(prev => {
-              return {
-                ...prev,
-                mark: res
-              }
-            })
-            
-          }
-          setIsChanged(true);
+        changeFieldData(type, itemData, field, value).then((res) => {
         });
       }
     },

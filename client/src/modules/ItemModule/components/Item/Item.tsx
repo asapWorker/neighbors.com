@@ -91,7 +91,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "sex")}
+            saveChanges={setNewData.bind(this, "usergenderid")}
             options={personSexes}
           >
             <Text type={TextType.Bold}>Пол:</Text>
@@ -101,7 +101,7 @@ export const Item: FunctionComponent<ItemProps> = ({
           <EditableText
             isNumber={true}
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "money")}
+            saveChanges={setNewData.bind(this, "payment")}
           >
             <Text type={TextType.Bold}>Бюджет:</Text>
             {itemData.money}
@@ -109,7 +109,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           {("attitudeTowardSmoking" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "attitude-toward-smoking")}
+            saveChanges={setNewData.bind(this, "smokingid")}
             options={attitudesTowardSmoking}
           >
             <Text type={TextType.Bold}>Отношение к курению:</Text>
@@ -118,7 +118,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           {("animals" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "animals")}
+            saveChanges={setNewData.bind(this, "animalid")}
             options={YesNoAnswers}
           >
             <Text type={TextType.Bold}>Есть животные:</Text>
@@ -145,7 +145,7 @@ export const Item: FunctionComponent<ItemProps> = ({
         <>
           {("address" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "address")}
+            saveChanges={setNewData.bind(this, "addressid")}
             options={addresses}
           >
             <Text type={TextType.Bold}>Адрес:</Text>
@@ -154,7 +154,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           {("metro" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "metro")}
+            saveChanges={setNewData.bind(this, "metroid")}
             options={metros}
           >
             <Text type={TextType.Bold}>Метро:</Text>
@@ -163,7 +163,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "sex")}
+            saveChanges={setNewData.bind(this, "housegenderid")}
             options={sexes}
           >
             <Text type={TextType.Bold}>Пол:</Text>
@@ -173,7 +173,7 @@ export const Item: FunctionComponent<ItemProps> = ({
           <EditableText
             isNumber={true}
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "money")}
+            saveChanges={setNewData.bind(this, "payment")}
           >
             <Text type={TextType.Bold}>Плата за месяц:</Text>
             {itemData.money}
@@ -181,7 +181,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           {("type" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "type")}
+            saveChanges={setNewData.bind(this, "housetypeid")}
             options={houseTypes}
           >
             <Text type={TextType.Bold}>Тип:</Text>
@@ -190,7 +190,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           {("smoking" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "smoking")}
+            saveChanges={setNewData.bind(this, "smokingid")}
             options={YesNoAnswers}
           >
             <Text type={TextType.Bold}>Разрешено курение:</Text>
@@ -199,7 +199,7 @@ export const Item: FunctionComponent<ItemProps> = ({
 
           {("animals" in itemData) && <EditableText
             isEditable={isEditable}
-            saveChanges={setNewData.bind(this, "animals")}
+            saveChanges={setNewData.bind(this, "animalid")}
             options={YesNoAnswers}
           >
             <Text type={TextType.Bold}>Разрешены животные:</Text>

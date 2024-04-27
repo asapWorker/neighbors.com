@@ -15,6 +15,7 @@ import {
 } from "../../../../constants/constants";
 import { TextField, TextFieldType } from "../../../../UI/TextField/TextField";
 import { SelectField } from "../../../../UI/SelectField/SelectField";
+import { Form } from "react-router-dom";
 
 export const enum FormType {
   Enter = "enter",
@@ -43,7 +44,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
     metros
   } = useFormData(type === FormType.NewAnnouncement, reportAboutSubmit);
 
-  if (type === FormType.Enter) {
+  if (type !== FormType.NewAnnouncement) {
     return (
       <form
         id="form"
@@ -54,7 +55,7 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
         )}
       >
         <div className={styles.container}>
-          <h3 className={styles.title}>Вход</h3>
+          <h3 className={styles.title}>{type === FormType.Registration ? "Регистрация" : "Вход"}</h3>
 
           <TextField name="login" isMessage={!isFilled} form="form">
             <Text type={TextType.Bold}>Логин:</Text>
@@ -71,16 +72,16 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
         </div>
 
         <div className={styles["btns-container"]}>
-          <Btn isSubmit={true} onClickHandle={submitChanges.bind(this)}>
-            Войти
+          <Btn isSubmit={true} onClickHandle={(type === FormType.Registration) ? signUp.bind(this) : submitChanges.bind(this)}>
+            {type === FormType.Registration ? "Готово" : "Вход"}
           </Btn>
 
-          <Btn
+          {type === FormType.Enter && <Btn
             style={styles["registration-btn"]}
             onClickHandle={goToRegistration.bind(this)}
           >
             Регистрация
-          </Btn>
+          </Btn>}
         </div>
       </form>
     );
@@ -96,23 +97,8 @@ export const FormModule: FunctionComponent<FormModuleProps> = ({
       >
         <div className={styles.container}>
           <h3 className={styles.title}>
-            {(type === FormType.NewAnnouncement) ? "Новое объявление" : "Регистрация"}
+            Новое объявление
           </h3>
-
-          {(type === FormType.Registration) && <>
-            <TextField name="login" isMessage={!isFilled} form={isHouse ? "house" : "person"}>
-              <Text type={TextType.Bold}>Логин:</Text>
-            </TextField>
-
-            <TextField
-              name="password"
-              isMessage={!isFilled}
-              type={TextFieldType.Password}
-              form={isHouse ? "house" : "person"}
-            >
-              <Text type={TextType.Bold}>Пароль:</Text>
-            </TextField>
-          </>}
 
           <div className={styles.target}>
             <Text type={TextType.Bold}>Ищу:</Text>

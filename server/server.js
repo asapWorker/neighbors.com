@@ -39,6 +39,8 @@ const { personsList, housesList, clients } = require("./tempData");
 const { 
   getHouses,
   getUsers, 
+  getUserLogin,
+  getItemId,
   getUsersInfo, 
   getAdditionalInfoHouses, 
   getAdditionalInfoUsers,
@@ -66,6 +68,11 @@ const {
   getMarks
 } = require("./neo4jModule/neo4jModule");
 
+// redis
+const {
+  cacheUserAnnouncement
+} = require("./redisModule/redisModule.js");
+
 /* -------------------------------- Функции для запросов к бд */
 
 /* Запросы */
@@ -73,27 +80,39 @@ const {
 /* get запросы */
 // получение урезанных списков, ищущих жилье или ищущих соседа
 app.get("/", (req, res) => {
-  /*
-  updateFields(false,2, 'first_name', 'Анастасия').then((res) => {
-    console.log(res);
-})*/
-/*
-data = {payment: 15000, addressid: 3, houseratingid: 3, userid: 3, housetypeid: 1, housegenderid: 1, smokingid: 2, animalid: 2, metroid: 8}
-addAnnouncement(true, data).then((res) => {
-  console.log(res);
-})
-const log = 'user10@mail.ru'
-const pass = '101010'
-registerUser(log, pass).then((res) => {
-  console.log(res);
-})*/
-  /*getHouses().then((housesList) => {
-    getUsers().then((personsList) => {
-      res.end(JSON.stringify([personsList, housesList]))
-    })
-  })*/
 
-  res.end(JSON.stringify([[], []]));
+  getHouses().then((housesList) => {
+    getUsers().then((personsList) => {
+
+      housesList.map((item_h) => {
+        getMarks(item_h.id).then((marks) => {
+          const count_h = marks.length;
+          const average_h = (!count_h) ? 0 : marks.reduce((sum = 0, mark) => {
+            return sum + Number(mark);
+          }) / count_h;
+
+          updateRatings(true, item_h.id, average_h, count_h).then(() => {
+
+            personsList.map((item_p) => {
+              getMarks(item_p.id).then((marks_p) => {
+                const count_p = marks_p.length;
+                const average_p = (!count_p) ? 0 : marks.reduce((sum = 0, mark_p) => {
+                  return sum + Number(mark_p);
+                }) / count_p;
+      
+                updateRatings(false, item_p.id, average_p, count_p).then(() => {
+                  res.end(JSON.stringify([personsList, housesList]));
+                })
+              })
+            })
+          })
+        })
+      })
+
+    })
+  })
+
+  //res.end(JSON.stringify([[], []]));
 });
 
 // получение дополнительных данных для конкретного пользователя или жилья
@@ -215,9 +234,65 @@ app.get("/metros", (req, res) => {
 /* POST запросы */
 // обработка добавления нового объявления
 app.post("/new-item", upload.any(), (req, res) => {
-  const announcement = req.body;
-  console.log(announcement);
-  res.end();
+  const obj = req.body;
+  const isHouse = obj.target === "house";
+
+  let announcement = {};
+
+  const clientObj = {
+    type: "client",
+    id: obj.id
+  }
+
+  const itemObj = {
+    type: obj.target
+  }
+
+  if (isHouse) {
+    announcement = {
+      addressid: obj.address,
+      houseratingid: 0,
+      userid: obj.id,
+      housetypeid: obj.type,
+      housegenderid: obj.sex,
+      smokingid: obj.smoking,
+      animalid: obj.animals,
+      metroid: obj.metro,
+      payment: obj.money
+    }
+  } else {
+    const names = obj.name.split(' ');
+    if (names.length < 2) {
+      names.push("");
+    }
+
+    announcement = {
+      ["first_name"]: names[0],
+      ["second_name"]: names[1],
+      age: obj.age,
+      payment: obj.money,
+      userratingid: 0,
+      animalid: obj.animals,
+      smokingid: obj.smoking,
+      usergenderid: obj.sex,
+      userid: obj.id
+    }
+  }
+
+  addAnnouncement(isHouse, announcement).then(() => {
+    getItemId(isHouse, announcement).then((itemId) => {
+      getUserLogin(clientObj.id).then((userName) => {
+        itemObj.name = obj.item;
+        itemObj.id = itemId;
+
+        clientObj.name = userName;
+
+        addOrUpdateConnection(clientObj, itemObj, "relation", 0, obj.usertype === "user").then(() => {
+          res.end();
+        })
+      })
+    })
+  })
 });
 
 // удаление объявления
@@ -227,11 +302,11 @@ app.post("/item/delete", (req, res) => {
 
   deleteNode(itemId).then(() => {
     if (itemType === "house") {
-      deleteHouseAnnouncement().then(() => {
+      deleteHouseAnnouncement(itemId).then(() => {
         res.end();
       })
     } else {
-      deleteUserAnnouncement().then(() => {
+      deleteUserAnnouncement(itemId).then(() => {
         res.end();
       })
     }
@@ -276,16 +351,13 @@ app.post("/item/change", upload.any(), (req, res) => {
   const itemType = req.query.item; // house | person
   const field = req.query.field; // field name
   const itemData = req.body.itemData; // item
-  // Дом: address | metro | sex | money | type | smoking | animals | bounded-items
-  // Человек: name | age | sex | money | attitude-toward-smoking | animals | bounded-items
-  const value = req.body.value;
 
-  console.log(itemType, field, itemData);
+  const value = req.body.value;
 
   if (field === "bounded-items") {
     const clientObj = {
       id: value.item.id,
-      name: value.item.login,
+      name: value.item.name,
       type: "client",
     };
     const rating = value.rating;
@@ -296,10 +368,31 @@ app.post("/item/change", upload.any(), (req, res) => {
       type: itemType,
     };
 
-    res.end(JSON.stringify(true));
+    addOrUpdateConnection(clientObj, itemObj, "relation", Number(rating)).then(() => {
+      res.end(JSON.stringify(true));
+    })
     
   } else {
-    res.end(JSON.stringify(null));
+
+    const isHouse = itemType === "house";
+
+    if (field === "name") {
+      const names = value.split(' ');
+      if (names.length < 2) {
+        names.push("");
+      }
+
+      updateFields(isHouse, itemData.id, "first_name", names[0]).then(() => {
+        updateFields(isHouse, itemData.id, "second_name", names[1]).then(() => {
+          res.end(JSON.stringify(true));
+        })
+      })
+    } else {
+
+      updateFields(isHouse, itemData.id, field, value).then(() => {
+        res.end(JSON.stringify(true));
+      })
+    }
   }
 });
 
@@ -345,7 +438,9 @@ app.post("/enter", upload.any(), (req, res) => {
 
 // обработка регистрации
 app.post("/registrate", upload.any(), (req, res) => {
+
   const obj = req.body;
-  console.log(obj);
-  res.end();
+  registerUser(obj.login, obj.password).then(() => {
+    res.end();
+  })
 });

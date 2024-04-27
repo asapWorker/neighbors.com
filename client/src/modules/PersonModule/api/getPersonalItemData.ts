@@ -17,5 +17,7 @@ export async function getPersonalItemData(id: string) {
     result.type = HouseType[result.type]
   }
 
+  console.log(result);
+
   return result;
 }
